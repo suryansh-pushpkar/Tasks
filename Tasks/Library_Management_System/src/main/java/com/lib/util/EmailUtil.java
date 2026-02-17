@@ -25,14 +25,14 @@ public class EmailUtil {
 		String adminMessage = "Hello "+name+"! You are successfully registered as the admin of the Library \n your membershipNo.:"
 				+ membershipNo + " \nand Password:" + rawPassword;
 		String userMessage = "Welcome! " + name
-				+ " You are registered as the memeber of the Library : \n Your \n membershipNo. : " + membershipNo
+				+ ", You are registered as the memeber of the Library : \n Your  membershipNo. : " + membershipNo
 				+ " \t and \n Password: " + rawPassword + " ";
 
 		try {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(username));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-			message.setSubject("Welcome to Our Library!");
+			message.setSubject("Registration Sucessfull!");
 			if (membershipNo.startsWith("AD")) {
 				message.setText(adminMessage);
 			} else {

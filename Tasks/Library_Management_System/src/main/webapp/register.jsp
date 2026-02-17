@@ -38,7 +38,7 @@ body {
 			<div class="card-body">
 				<h3 class="text-center mb-4">Create Account</h3>
 
-				<form id="regForm" action="/register" method="POST">
+				<form id="regForm" action="register" method="POST">
 					<div class="form-group">
 						<label for="name">Full Name</label> <input type="text"
 							class="form-control" id="name" name="name" placeholder="John Doe"
@@ -46,7 +46,7 @@ body {
 					</div>
 
 					<div class="form-group">
-						<label for="mail">Email Address</label> <input type="email"
+						<label for="mail">Email Address</label> <input type="mail"
 							class="form-control" id="mail" name="mail"
 							placeholder="name@example.com" required>
 					</div>

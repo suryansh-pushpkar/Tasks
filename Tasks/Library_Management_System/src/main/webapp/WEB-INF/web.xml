@@ -41,10 +41,35 @@
 		<servlet-class>com.lib.controller.CreateBookServlet</servlet-class>
 	</servlet>
 
-
 	<servlet-mapping>
 		<servlet-name>CreateBookServlet</servlet-name>
 		<url-pattern>/addBook</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>UserDashboardServlet</servlet-name>
+		<servlet-class>com.lib.controller.UserDashboardServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>UserDashboardServlet</servlet-name>
+		<url-pattern>/userDashboard</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>UserRegisterServlet</servlet-name>
+		<servlet-class>com.lib.controller.UserRegisterServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>UserRegisterServlet</servlet-name>
+		<url-pattern>/register</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>UserLoginServlet</servlet-name>
+		<servlet-class>com.lib.controller.UserLoginServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>UserLoginServlet</servlet-name>
+		<url-pattern>/login</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

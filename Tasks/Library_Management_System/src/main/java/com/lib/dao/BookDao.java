@@ -8,6 +8,7 @@ import com.lib.util.JPAUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 
 public class BookDao {
 
@@ -52,8 +53,7 @@ public class BookDao {
 		try {
 			String jpql = "SELECT b FROM Book b WHERE b.name = :name AND b.author = :author";
 			return em.createQuery(jpql, Book.class).setParameter("name", name).setParameter("author", author)
-					.setMaxResults(1) 
-					.getSingleResult();
+					.setMaxResults(1).getSingleResult();
 		} catch (Exception e) {
 			return null;
 		} finally {
@@ -87,7 +87,6 @@ public class BookDao {
 		try {
 			tx.begin();
 
-			
 			String jpql = "DELETE FROM Book b WHERE b.name = :name AND b.author = :author AND b.library.id = :libId";
 
 			int deletedCount = em.createQuery(jpql).setParameter("name", name).setParameter("author", author)
@@ -102,6 +101,25 @@ public class BookDao {
 			throw e;
 		} finally {
 			em.close();
+		}
+	}
+
+	public List<Book> getBooks(int pageNumber, int pageSize) {
+		EntityManager em = factory.createEntityManager();
+		try {
+			String jpql = "SELECT DISTINCT b FROM Book b LEFT JOIN FETCH b.issueRecords";
+			TypedQuery<Book> query = em.createQuery(jpql, Book.class);
+
+			int startIndex = (pageNumber - 1) * pageSize;
+			query.setFirstResult(startIndex);
+			query.setMaxResults(pageSize);
+
+			return query.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			em.close(); 
 		}
 	}
 }

@@ -31,7 +31,6 @@ public class AdminRegisterServlet extends HttpServlet {
 
 		try {
 			AdminIdAssigner.assignUniqueId(admin);
-
 			EmailUtil.sendWelcomeEmail(admin.getMail(), admin.getName(), admin.getMembershipNo(), admin.getPassword());
 
 			AdminDao dao = new AdminDao();
@@ -40,9 +39,7 @@ public class AdminRegisterServlet extends HttpServlet {
 				HttpSession session = request.getSession();
 				session.setAttribute("currentAdmin", admin);
 				session.setAttribute("role", "ADMIN");
-
-				session.setMaxInactiveInterval(60 * 60);
-
+				session.setMaxInactiveInterval(60 * 60*6);
 				response.sendRedirect("createlib.jsp");
 			}
 

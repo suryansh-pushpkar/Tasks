@@ -45,4 +45,21 @@ public class UserDao {
 		}
 	}
 
+	public User getUserByMnoAndEmail(String membershipNo, String mail) {
+		EntityManagerFactory factory = JPAUtil.getFactory();
+		EntityManager em = factory.createEntityManager();
+		try {
+			String jpql = "SELECT u FROM User u WHERE u.membershipNo = :mNo AND u.mail = :mail";
+			TypedQuery<User> query = em.createQuery(jpql, User.class);
+			query.setParameter("mNo", membershipNo);
+			query.setParameter("mail", mail);
+
+			return query.getSingleResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			em.close();
+		}
+	}
 }

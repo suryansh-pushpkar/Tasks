@@ -29,7 +29,7 @@ body {
 			<div class="card-body">
 				<h3 class="text-center mb-4">Member Login</h3>
 
-				<form action="/login" method="POST">
+				<form action="login" method="POST">
 					<div class="form-group">
 						<label for="membershipNo">Membership Number</label> <input
 							type="text" class="form-control" id="membershipNo"
