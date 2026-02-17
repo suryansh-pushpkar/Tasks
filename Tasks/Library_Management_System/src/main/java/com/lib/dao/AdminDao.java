@@ -1,6 +1,7 @@
 package com.lib.dao;
 
 import com.lib.entity.Admin;
+import com.lib.entity.Library;
 import com.lib.util.AdminIdAssigner;
 import com.lib.util.EmailUtil;
 import com.lib.util.JPAUtil;
@@ -76,6 +77,25 @@ public class AdminDao {
 				tx.rollback();
 			}
 			e.printStackTrace();
+		}
+	}
+
+	public Library getLibrary(Admin admin) {
+		EntityManagerFactory factory = JPAUtil.getFactory();
+		EntityManager em = factory.createEntityManager();
+		try {
+			String jpql = "SELECT l FROM Library l WHERE l.owner = :admin";
+			TypedQuery<Library> query = em.createQuery(jpql, Library.class);
+			query.setParameter("admin", admin);
+
+			return query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			em.close();
 		}
 	}
 }

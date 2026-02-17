@@ -43,7 +43,7 @@ public class AdminRegisterServlet extends HttpServlet {
 
 				session.setMaxInactiveInterval(60 * 60);
 
-				response.sendRedirect("admindashboard.jsp");
+				response.sendRedirect("createlib.jsp");
 			}
 
 		} catch (Exception e) {

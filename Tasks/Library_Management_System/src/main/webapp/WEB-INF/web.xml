@@ -26,7 +26,26 @@
 		<url-pattern>/adminLogin</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>CreateLibraryServlet</servlet-name>
+		<servlet-class>com.lib.controller.CreateLibraryServlet</servlet-class>
+	</servlet>
 
+	<servlet-mapping>
+		<servlet-name>CreateLibraryServlet</servlet-name>
+		<url-pattern>/createLibrary</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CreateBookServlet</servlet-name>
+		<servlet-class>com.lib.controller.CreateBookServlet</servlet-class>
+	</servlet>
+
+
+<servlet-mapping>
+    <servlet-name>CreateBookServlet</servlet-name>
+    <url-pattern>/addBook</url-pattern>
+</servlet-mapping>
 
 
 

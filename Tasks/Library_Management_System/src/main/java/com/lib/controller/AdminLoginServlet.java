@@ -2,6 +2,8 @@ package com.lib.controller;
 
 import com.lib.dao.AdminDao;
 import com.lib.entity.Admin;
+import com.lib.entity.Library;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -12,27 +14,35 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-
 public class AdminLoginServlet extends HttpServlet {
 
-	private AdminDao adminDao;
+	private AdminDao adminDao = new AdminDao();
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		String membershipNo = request.getParameter("membershipNo");
 		String password = request.getParameter("password");
+		
+		
 
 		Admin admin = adminDao.login(membershipNo, password);
+		Library lib = adminDao.getLibrary(admin);
+		
+		try {
+			if (admin != null) {
+				HttpSession session = request.getSession(true);
+				session.setAttribute("currentAdmin", admin);
+				session.setAttribute("role", "ADMIN");
+				session.setAttribute("currentLibrary", lib);
+				response.sendRedirect("admindashboard.jsp");
+			} else {
+				response.sendRedirect("admindashboard.jsp");
+			}
+		} catch (
 
-		if (admin != null) {
-			HttpSession session = request.getSession(true);
-			session.setAttribute("currentAdmin", admin);
-			session.setAttribute("role", "ADMIN");
-
-			response.sendRedirect("admindashboard.jsp");
-		} else {
-			response.sendRedirect("adminlogin.jsp");
+		Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
