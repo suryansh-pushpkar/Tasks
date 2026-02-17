@@ -48,11 +48,11 @@ public class BookDao {
 	}
 
 	public Book findBookByNameAndAuthor(String name, String author) {
-		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		EntityManager em = factory.createEntityManager();
 		try {
 			String jpql = "SELECT b FROM Book b WHERE b.name = :name AND b.author = :author";
 			return em.createQuery(jpql, Book.class).setParameter("name", name).setParameter("author", author)
-					.setMaxResults(1) // Just need one copy to get details
+					.setMaxResults(1) 
 					.getSingleResult();
 		} catch (Exception e) {
 			return null;
@@ -62,7 +62,7 @@ public class BookDao {
 	}
 
 	public void updateBookDetails(String oldName, String oldAuthor, String newName, String newAuthor, String newIsbn) {
-		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		EntityManager em = factory.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
@@ -82,7 +82,7 @@ public class BookDao {
 	}
 
 	public void deleteBooksByNameAndAuthor(String name, String author, int libraryId) {
-		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		EntityManager em = factory.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();

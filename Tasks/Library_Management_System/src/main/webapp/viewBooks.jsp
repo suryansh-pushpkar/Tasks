@@ -35,7 +35,6 @@
         }
     }
 
-    // 3. FETCH DATA FOR DISPLAY
     List<Object[]> groupedBooks = null;
     String libName = "Your Library";
     if (lib != null) {
