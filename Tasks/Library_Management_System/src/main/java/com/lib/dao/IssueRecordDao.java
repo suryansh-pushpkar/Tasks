@@ -12,9 +12,21 @@ import java.util.concurrent.TimeUnit;
 
 public class IssueRecordDao {
 
+	public List<IssueRecord> getRenewalRequestsByLibrary(int libId) {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			String jpql = "SELECT r FROM IssueRecord r JOIN r.book b "
+					+ "WHERE b.library.id = :libId AND r.status = 'RENEW_REQUESTED'";
+			return em.createQuery(jpql, IssueRecord.class).setParameter("libId", libId).getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
 	public boolean isBookRequestedByOthers(int bookId) {
 		EntityManager em = JPAUtil.getFactory().createEntityManager();
 		try {
+
 			String jpql = "SELECT COUNT(r) FROM IssueRecord r WHERE r.book.id = :bId AND r.status = 'PENDING'";
 			Long count = em.createQuery(jpql, Long.class).setParameter("bId", bookId).getSingleResult();
 			return count > 0;
@@ -27,22 +39,22 @@ public class IssueRecordDao {
 		EntityManager em = JPAUtil.getFactory().createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
+			tx.begin();
+			IssueRecord record = em.find(IssueRecord.class, recordId);
 
-			if (isBookRequestedByOthers(recordId)) {
-				tx.begin();
-				IssueRecord record = em.find(IssueRecord.class, recordId);
+			if (record != null) {
+				// Calculate the new date
+				java.util.Calendar cal = java.util.Calendar.getInstance();
+				cal.setTime(record.getEndDate());
+				cal.add(java.util.Calendar.DAY_OF_MONTH, daysToAdd);
 
-				if (record != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(record.getEndDate());
-					cal.add(Calendar.DAY_OF_MONTH, daysToAdd);
+				// Update the record
+				record.setEndDate(cal.getTime());
+				record.setStatus("ISSUED");
 
-					record.setEndDate(cal.getTime());
-					em.merge(record);
-
-					tx.commit();
-					return true;
-				}
+				em.merge(record);
+				tx.commit();
+				return true;
 			}
 			return false;
 		} catch (Exception e) {
@@ -139,21 +151,24 @@ public class IssueRecordDao {
 		}
 	}
 
-	public List<IssueRecord> getActiveIssuesByUser(int userId) {
+	public List<IssueRecord> getActiveIssuesByLibrary(int libId) {
 		EntityManager em = JPAUtil.getFactory().createEntityManager();
 		try {
-			return em.createQuery("SELECT r FROM IssueRecord r WHERE r.user.id = :uId AND r.status = 'ISSUED'",
-					IssueRecord.class).setParameter("uId", userId).getResultList();
+			String jpql = "SELECT r FROM IssueRecord r JOIN r.book b "
+					+ "WHERE b.library.id = :libId AND r.status = 'ISSUED' " + "ORDER BY r.endDate ASC";
+			return em.createQuery(jpql, IssueRecord.class).setParameter("libId", libId).getResultList();
 		} finally {
 			em.close();
 		}
 	}
 
-	public List<IssueRecord> getAllIssuesByUser(int userId) {
+	public List<IssueRecord> getActiveIssuesByUser(int userId) {
 		EntityManager em = JPAUtil.getFactory().createEntityManager();
 		try {
-			return em.createQuery("SELECT r FROM IssueRecord r WHERE r.user.id = :uId ORDER BY r.startDate DESC",
-					IssueRecord.class).setParameter("uId", userId).getResultList();
+			String jpql = "SELECT r FROM IssueRecord r JOIN FETCH r.book "
+					+ "WHERE r.user.id = :uId AND r.status = 'ISSUED'";
+
+			return em.createQuery(jpql, IssueRecord.class).setParameter("uId", userId).getResultList();
 		} finally {
 			em.close();
 		}
@@ -169,6 +184,22 @@ public class IssueRecordDao {
 		}
 	}
 
+	public List<IssueRecord> getAllIssuesByUser(int userId) {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			
+			String jpql = "SELECT r FROM IssueRecord r " + "JOIN FETCH r.book b " + "JOIN FETCH b.library "
+					+ "WHERE r.user.id = :uId " + "ORDER BY r.startDate DESC";
+
+			return em.createQuery(jpql, IssueRecord.class).setParameter("uId", userId).getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new java.util.ArrayList<>(); // Return empty list instead of null to avoid JSP crashes
+		} finally {
+			em.close();
+		}
+	}
+
 	public boolean isBookCurrentlyIssued(int bookId) {
 		EntityManager em = JPAUtil.getFactory().createEntityManager();
 		try {
@@ -177,6 +208,18 @@ public class IssueRecordDao {
 							Long.class)
 					.setParameter("bId", bookId).getSingleResult();
 			return count > 0;
+		} finally {
+			em.close();
+		}
+	}
+
+	public List<IssueRecord> getPendingRequestsByLibrary(int libId) {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			// We filter by b.library.id because the book belongs to the library
+			String jpql = "SELECT r FROM IssueRecord r JOIN r.book b "
+					+ "WHERE b.library.id = :libId AND r.status = 'PENDING'";
+			return em.createQuery(jpql, IssueRecord.class).setParameter("libId", libId).getResultList();
 		} finally {
 			em.close();
 		}

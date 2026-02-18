@@ -1,14 +1,9 @@
 package com.lib.dao;
 
 import java.util.List;
-
 import com.lib.entity.Book;
 import com.lib.util.JPAUtil;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 
 public class BookDao {
 
@@ -23,86 +18,68 @@ public class BookDao {
 			tx.commit();
 			return book;
 		} catch (Exception e) {
-			if (tx.isActive() && (tx != null))
+			if (tx.isActive())
 				tx.rollback();
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	public long getTotalBookCount() {
-		EntityManager em = JPAUtil.getFactory().createEntityManager();
-		try {
-			return em.createQuery("SELECT COUNT(b) FROM Book b", Long.class).getSingleResult();
+			throw new RuntimeException(e);
 		} finally {
 			em.close();
 		}
 	}
 
-	public long getAvailableBookCount() {
-		EntityManager em = JPAUtil.getFactory().createEntityManager();
+	public long getAvailableBookCountByLibrary(int libId) {
+		EntityManager em = factory.createEntityManager();
 		try {
-			String jpql = "SELECT COUNT(b) FROM Book b WHERE b.id NOT IN "
-					+ "(SELECT r.book.id FROM IssueRecord r WHERE r.status IN ('ISSUED', 'PENDING'))";
-			return em.createQuery(jpql, Long.class).getSingleResult();
+			String jpql = "SELECT COUNT(b) FROM Book b WHERE b.library.id = :libId AND b.id NOT IN "
+					+ "(SELECT r.book.id FROM IssueRecord r WHERE r.status IN ('ISSUED', 'PENDING', 'RENEW_REQUESTED'))";
+			return em.createQuery(jpql, Long.class).setParameter("libId", libId).getSingleResult();
 		} finally {
 			em.close();
 		}
 	}
 
 	public List<Object[]> getBooksWithQuantities(int libraryId) {
-		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		EntityManager em = factory.createEntityManager();
 		try {
-
-			String jpql = "SELECT b.name, b.author, COUNT(b) " + "FROM Book b WHERE b.library.id = :libId "
-					+ "AND b.id NOT IN (SELECT r.book.id FROM IssueRecord r WHERE r.status = 'ISSUED') "
+			String jpql = "SELECT b.name, b.author, COUNT(b) " + "FROM Book b " + "WHERE b.library.id = :libId "
+					+ "AND b.id NOT IN (SELECT r.book.id FROM IssueRecord r WHERE r.status IN ('ISSUED', 'PENDING')) "
 					+ "GROUP BY b.name, b.author";
+
 			return em.createQuery(jpql, Object[].class).setParameter("libId", libraryId).getResultList();
 		} finally {
 			em.close();
 		}
 	}
 
-	public Book findBookByNameAndAuthor(String name, String author) {
+	public List<Object[]> getAllBooksWithStatus(int libId) {
 		EntityManager em = factory.createEntityManager();
 		try {
-			String jpql = "SELECT b FROM Book b WHERE b.name = :name AND b.author = :author";
-			return em.createQuery(jpql, Book.class).setParameter("name", name).setParameter("author", author)
-					.setMaxResults(1).getSingleResult();
-		} catch (Exception e) {
-			return null;
-		} finally {
-			em.close();
-		}
-	}
+			
+			String jpql = "SELECT b.name, b.author, b.isbn, "
+					+ "(SELECT r.status FROM IssueRecord r WHERE r.book.id = b.id "
+					+ "AND r.status IN ('ISSUED', 'PENDING', 'RENEW_REQUESTED') ORDER BY r.id DESC) "
+					+ "FROM Book b WHERE b.library.id = :libId";
 
-	public void updateBookDetails(String oldName, String oldAuthor, String newName, String newAuthor, String newIsbn) {
-		EntityManager em = factory.createEntityManager();
-		EntityTransaction tx = em.getTransaction();
-		try {
-			tx.begin();
-			String jpql = "UPDATE Book b SET b.name = :newName, b.author = :newAuthor, b.isbn = :newIsbn "
-					+ "WHERE b.name = :oldName AND b.author = :oldAuthor";
-			em.createQuery(jpql).setParameter("newName", newName).setParameter("newAuthor", newAuthor)
-					.setParameter("newIsbn", newIsbn).setParameter("oldName", oldName)
-					.setParameter("oldAuthor", oldAuthor).executeUpdate();
-			tx.commit();
-		} catch (Exception e) {
-			if (tx.isActive())
-				tx.rollback();
-			throw e;
+			return em.createQuery(jpql, Object[].class).setParameter("libId", libId).getResultList();
 		} finally {
 			em.close();
 		}
 	}
 
 	public Book findById(int id) {
-		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		EntityManager em = factory.createEntityManager();
 		try {
 			return em.find(Book.class, id);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	public List<Book> searchBooks(String query) {
+		EntityManager em = factory.createEntityManager();
+		try {
+			String jpql = "SELECT b FROM Book b JOIN FETCH b.library WHERE LOWER(b.name) LIKE LOWER(:query) "
+					+ "OR LOWER(b.author) LIKE LOWER(:query)";
+			return em.createQuery(jpql, Book.class).setParameter("query", "%" + query + "%").getResultList();
 		} finally {
 			em.close();
 		}
@@ -113,51 +90,64 @@ public class BookDao {
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
-
 			String jpql = "DELETE FROM Book b WHERE b.name = :name AND b.author = :author AND b.library.id = :libId";
-
-			int deletedCount = em.createQuery(jpql).setParameter("name", name).setParameter("author", author)
+			em.createQuery(jpql).setParameter("name", name).setParameter("author", author)
 					.setParameter("libId", libraryId).executeUpdate();
-
 			tx.commit();
-			System.out.println("Deleted " + deletedCount + " copies of " + name);
 		} catch (Exception e) {
 			if (tx.isActive())
 				tx.rollback();
-			e.printStackTrace();
 			throw e;
 		} finally {
 			em.close();
 		}
 	}
 
-	public List<Book> getBooks(int pageNumber, int pageSize) {
+	public Book findBookByNameAuthorAndLibrary(String name, String author, int libId) {
 		EntityManager em = factory.createEntityManager();
 		try {
-			String jpql = "SELECT DISTINCT b FROM Book b LEFT JOIN FETCH b.issueRecords";
-			TypedQuery<Book> query = em.createQuery(jpql, Book.class);
+			String jpql = "SELECT b FROM Book b WHERE b.name = :name "
+					+ "AND b.author = :author AND b.library.id = :libId";
 
-			int startIndex = (pageNumber - 1) * pageSize;
-			query.setFirstResult(startIndex);
-			query.setMaxResults(pageSize);
-
-			return query.getResultList();
-		} catch (Exception e) {
-			e.printStackTrace();
+			return em.createQuery(jpql, Book.class).setParameter("name", name).setParameter("author", author)
+					.setParameter("libId", libId).setMaxResults(1).getSingleResult();
+		} catch (NoResultException e) {
 			return null;
 		} finally {
 			em.close();
 		}
 	}
 
-	public List<Book> searchBooks(String query) {
-		EntityManager em = JPAUtil.getFactory().createEntityManager();
+	public long getTotalBookCountByLibrary(int libId) {
+		EntityManager em = factory.createEntityManager();
 		try {
-			String jpql = "SELECT b FROM Book b WHERE b.name LIKE :q OR b.author LIKE :q";
-			return em.createQuery(jpql, Book.class).setParameter("q", "%" + query + "%").setMaxResults(10)
-					.getResultList();
+			return em.createQuery("SELECT COUNT(b) FROM Book b WHERE b.library.id = :libId", Long.class)
+					.setParameter("libId", libId).getSingleResult();
 		} finally {
 			em.close();
 		}
 	}
+
+	public void updateBookDetails(String oldName, String oldAuthor, String newName, String newAuthor, String newIsbn,
+			int libId) {
+		EntityManager em = factory.createEntityManager();
+		EntityTransaction tx = em.getTransaction();
+		try {
+			tx.begin();
+			String jpql = "UPDATE Book b SET b.name = :newName, b.author = :newAuthor, b.isbn = :newIsbn "
+					+ "WHERE b.name = :oldName AND b.author = :oldAuthor AND b.library.id = :libId";
+
+			em.createQuery(jpql).setParameter("newName", newName).setParameter("newAuthor", newAuthor)
+					.setParameter("newIsbn", newIsbn).setParameter("oldName", oldName)
+					.setParameter("oldAuthor", oldAuthor).setParameter("libId", libId).executeUpdate();
+			tx.commit();
+		} catch (Exception e) {
+			if (tx.isActive())
+				tx.rollback();
+			throw e;
+		} finally {
+			em.close();
+		}
+	}
+
 }

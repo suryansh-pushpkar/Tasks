@@ -25,7 +25,23 @@
 		<servlet-name>AdminLoginServlet</servlet-name>
 		<url-pattern>/adminLogin</url-pattern>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>RejectRenewalServlet</servlet-name>
+		<servlet-class>com.lib.controller.RejectRenewalServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RejectRenewalServlet</servlet-name>
+		<url-pattern>/rejectRenewal</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ApproveRenewalServlet</servlet-name>
+		<servlet-class>com.lib.controller.ApproveRenewalServlet</servlet-class>
+	</servlet>
 
+	<servlet-mapping>
+		<servlet-name>ApproveRenewalServlet</servlet-name>
+		<url-pattern>/approveRenewal</url-pattern>
+	</servlet-mapping>
 	<servlet>
 		<servlet-name>CreateLibraryServlet</servlet-name>
 		<servlet-class>com.lib.controller.CreateLibraryServlet</servlet-class>
@@ -61,6 +77,16 @@
 	<servlet-mapping>
 		<servlet-name>UserRegisterServlet</servlet-name>
 		<url-pattern>/register</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>RenewAction</servlet-name>
+		<servlet-class>com.lib.controller.RequestRenewServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>RenewAction</servlet-name>
+		<url-pattern>/requestRenew</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

@@ -30,7 +30,8 @@ public class AdminRegisterServlet extends HttpServlet {
 		admin.setAddress(address);
 
 		try {
-			AdminIdAssigner.assignUniqueId(admin);
+			String id =AdminIdAssigner.assignUniqueId(admin);
+			admin.setMembershipNo(id);
 			EmailUtil.sendWelcomeEmail(admin.getMail(), admin.getName(), admin.getMembershipNo(), admin.getPassword());
 
 			AdminDao dao = new AdminDao();

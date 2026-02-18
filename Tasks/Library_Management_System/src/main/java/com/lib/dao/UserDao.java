@@ -39,7 +39,7 @@ public class UserDao {
 			return query.getSingleResult();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			throw new RuntimeException(e.getMessage());
 		} finally {
 			em.close();
 		}
