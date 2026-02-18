@@ -4,11 +4,56 @@ import com.lib.entity.IssueRecord;
 import com.lib.util.JPAUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class IssueRecordDao {
+
+	public boolean isBookRequestedByOthers(int bookId) {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			String jpql = "SELECT COUNT(r) FROM IssueRecord r WHERE r.book.id = :bId AND r.status = 'PENDING'";
+			Long count = em.createQuery(jpql, Long.class).setParameter("bId", bookId).getSingleResult();
+			return count > 0;
+		} finally {
+			em.close();
+		}
+	}
+
+	public boolean updateRenewalDate(int recordId, int daysToAdd) {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		EntityTransaction tx = em.getTransaction();
+		try {
+
+			if (isBookRequestedByOthers(recordId)) {
+				tx.begin();
+				IssueRecord record = em.find(IssueRecord.class, recordId);
+
+				if (record != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(record.getEndDate());
+					cal.add(Calendar.DAY_OF_MONTH, daysToAdd);
+
+					record.setEndDate(cal.getTime());
+					em.merge(record);
+
+					tx.commit();
+					return true;
+				}
+			}
+			return false;
+		} catch (Exception e) {
+			if (tx.isActive())
+				tx.rollback();
+			e.printStackTrace();
+			return false;
+		} finally {
+			em.close();
+		}
+	}
 
 	public IssueRecord findById(int id) {
 		EntityManager em = JPAUtil.getFactory().createEntityManager();

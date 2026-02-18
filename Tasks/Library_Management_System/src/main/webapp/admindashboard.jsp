@@ -90,7 +90,13 @@ body {
 </style>
 </head>
 <body>
-
+	<% if (request.getParameter("msg") != null) { %>
+	<div class="alert alert-success alert-dismissible fade show">
+		<strong>Success!</strong>
+		<%= request.getParameter("msg") %>
+		<button type="button" class="close" data-dismiss="alert">&times;</button>
+	</div>
+	<% } %>
 	<div class="container-fluid">
 		<div class="row">
 			<nav class="col-md-2 d-none d-md-block sidebar">
@@ -245,8 +251,7 @@ body {
 												<td>
 													<%
 													boolean isOverdue = new java.util.Date().after(record.getEndDate());
-													%>
-													<span
+													%> <span
 													class="<%=isOverdue ? "text-danger font-weight-bold" : ""%>">
 														<%=record.getEndDate()%> <%=isOverdue ? "<i class='fas fa-exclamation-triangle'></i>" : ""%>
 												</span>

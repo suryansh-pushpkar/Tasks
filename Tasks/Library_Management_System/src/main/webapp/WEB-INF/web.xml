@@ -97,7 +97,14 @@
 		<servlet-name>ApproveIssueServlet</servlet-name>
 		<url-pattern>/approveIssue</url-pattern>
 	</servlet-mapping>
-
+	<servlet>
+		<servlet-name>ReturnBookServlet</servlet-name>
+		<servlet-class>com.lib.controller.ReturnBookServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ReturnBookServlet</servlet-name>
+		<url-pattern>/returnBook</url-pattern>
+	</servlet-mapping>
 	<servlet>
 		<servlet-name>RejectIssueServlet</servlet-name>
 		<servlet-class>com.lib.controller.RejectIssueServlet</servlet-class>
