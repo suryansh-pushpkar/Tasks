@@ -81,8 +81,47 @@
 		<servlet-name>ViewBooksServlet</servlet-name>
 		<url-pattern>/viewBooks</url-pattern>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>SearchBookServlet</servlet-name>
+		<servlet-class>com.lib.controller.SearchBookServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SearchBookServlet</servlet-name>
+		<url-pattern>/searchBooks</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ApproveIssueServlet</servlet-name>
+		<servlet-class>com.lib.controller.ApproveIssueServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ApproveIssueServlet</servlet-name>
+		<url-pattern>/approveIssue</url-pattern>
+	</servlet-mapping>
 
-
+	<servlet>
+		<servlet-name>RejectIssueServlet</servlet-name>
+		<servlet-class>com.lib.controller.RejectIssueServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RejectIssueServlet</servlet-name>
+		<url-pattern>/rejectIssue</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ConfirmIssueServlet</servlet-name>
+		<servlet-class>com.lib.controller.ConfirmIssueServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>LogoutServlet</servlet-name>
+		<servlet-class>com.lib.controller.LogoutServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LogoutServlet</servlet-name>
+		<url-pattern>/logout</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ConfirmIssueServlet</servlet-name>
+		<url-pattern>/confirmIssueAction</url-pattern>
+	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>

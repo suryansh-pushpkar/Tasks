@@ -30,19 +30,34 @@ public class BookDao {
 		}
 	}
 
+	public long getTotalBookCount() {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			return em.createQuery("SELECT COUNT(b) FROM Book b", Long.class).getSingleResult();
+		} finally {
+			em.close();
+		}
+	}
+
+	public long getAvailableBookCount() {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			String jpql = "SELECT COUNT(b) FROM Book b WHERE b.id NOT IN "
+					+ "(SELECT r.book.id FROM IssueRecord r WHERE r.status IN ('ISSUED', 'PENDING'))";
+			return em.createQuery(jpql, Long.class).getSingleResult();
+		} finally {
+			em.close();
+		}
+	}
+
 	public List<Object[]> getBooksWithQuantities(int libraryId) {
 		EntityManager em = JPAUtil.getFactory().createEntityManager();
 		try {
-			System.out.println("Searching books for Library ID: " + libraryId);
 
-			String jpql = "SELECT b.name, b.author, COUNT(b), b.isbn " + "FROM Book b WHERE b.library.id = :libId "
-					+ "GROUP BY b.name, b.author, b.isbn";
-
-			List<Object[]> results = em.createQuery(jpql, Object[].class).setParameter("libId", libraryId)
-					.getResultList();
-
-			System.out.println("Books found: " + results.size());
-			return results;
+			String jpql = "SELECT b.name, b.author, COUNT(b) " + "FROM Book b WHERE b.library.id = :libId "
+					+ "AND b.id NOT IN (SELECT r.book.id FROM IssueRecord r WHERE r.status = 'ISSUED') "
+					+ "GROUP BY b.name, b.author";
+			return em.createQuery(jpql, Object[].class).setParameter("libId", libraryId).getResultList();
 		} finally {
 			em.close();
 		}
@@ -76,6 +91,18 @@ public class BookDao {
 			if (tx.isActive())
 				tx.rollback();
 			throw e;
+		} finally {
+			em.close();
+		}
+	}
+
+	public Book findById(int id) {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			return em.find(Book.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		} finally {
 			em.close();
 		}
@@ -119,7 +146,18 @@ public class BookDao {
 			e.printStackTrace();
 			return null;
 		} finally {
-			em.close(); 
+			em.close();
+		}
+	}
+
+	public List<Book> searchBooks(String query) {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			String jpql = "SELECT b FROM Book b WHERE b.name LIKE :q OR b.author LIKE :q";
+			return em.createQuery(jpql, Book.class).setParameter("q", "%" + query + "%").setMaxResults(10)
+					.getResultList();
+		} finally {
+			em.close();
 		}
 	}
 }
