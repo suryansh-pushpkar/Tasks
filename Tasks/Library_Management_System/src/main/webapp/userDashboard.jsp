@@ -9,7 +9,7 @@
 
 <%
 HttpSession currentSession = request.getSession(false);
-User user1 = (User)currentSession.getAttribute("currentUser");
+User user1 = (User) currentSession.getAttribute("currentUser");
 String mNo = user1.getMembershipNo();
 String mail = user1.getMail();
 if (mNo == null || mail == null) {
@@ -285,7 +285,7 @@ body {
 			clearTimeout(timeout);
 			let query = $("#bookSearch").val().trim();
 			let resultsDiv = $("#searchResults");
-			if (query.length < 2) {
+			if (query.length < 1) {
 				resultsDiv.empty().hide();
 				return;
 			}
