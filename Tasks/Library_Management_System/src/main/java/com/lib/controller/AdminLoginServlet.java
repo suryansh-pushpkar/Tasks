@@ -21,21 +21,24 @@ public class AdminLoginServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String membershipNo = request.getParameter("membershipNo");
-		String password = request.getParameter("password");
-		
-		
+		String membershipNo = request.getParameter("membershipNo").trim();
+		String password = request.getParameter("password").trim();
 
 		Admin admin = adminDao.login(membershipNo, password);
 		Library lib = adminDao.getLibrary(admin);
-		
+
 		try {
 			if (admin != null) {
 				HttpSession session = request.getSession(true);
 				session.setAttribute("currentAdmin", admin);
 				session.setAttribute("role", "ADMIN");
 				session.setAttribute("currentLibrary", lib);
-				response.sendRedirect("admindashboard.jsp");
+				if (lib != null)
+					response.sendRedirect("admindashboard.jsp");
+
+				else
+					response.sendRedirect("createlib.jsp");
+
 			} else {
 				response.sendRedirect("admindashboard.jsp");
 			}

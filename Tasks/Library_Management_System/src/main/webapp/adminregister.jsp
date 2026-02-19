@@ -8,7 +8,7 @@
 <title>Library Manager: Admin Registration</title>
 <style>
 body {
-	background-color: #212529; /* Darker theme for Admin */
+	background-color: #212529;
 	min-height: 100vh;
 	display: flex;
 	align-items: center;
@@ -98,34 +98,35 @@ body {
 				.ready(
 						function() {
 							$('#adminRegForm')
-									.on(
-											'submit',
-											function(e) {
+									.on('submit',function(e) {
+										const name = $('#name').val();
+										const nameRegex = /^[A-Za-z\s]+$/; 
+
+										// Name Validation
+										if (!nameRegex.test(name)) {
+										    showError('#name', 'Name should only contain alphabets.');
+										    isValid = false;
+										}
 												$('.form-control').removeClass(
 														'is-invalid');
 												$('.invalid-feedback').remove();
 
 												const password = $('#password')
 														.val();
-												const confirmPassword = $(
-														'#confirmPassword')
-														.val();
+												const confirmPassword = $('#confirmPassword').val();
 												const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
 												let isValid = true;
 
 												// Password Logic
 												if (password.length < 8
-														|| !specialCharRegex
-																.test(password)) {
-													showError('#password',
-															'Password must be 8+ characters and contain a special character.');
+														|| !specialCharRegex.test(password)) {
+													showError('#password','Password must be 8+ characters and contain a special character.');
 													isValid = false;
 												}
 
 												if (password !== confirmPassword) {
 													showError(
-															'#confirmPassword',
-															'Passwords do not match.');
+															'#confirmPassword','Passwords do not match.');
 													isValid = false;
 												}
 
