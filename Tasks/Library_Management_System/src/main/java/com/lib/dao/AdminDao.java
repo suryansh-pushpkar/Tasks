@@ -38,7 +38,7 @@ public class AdminDao {
 			admin.setMembershipNo(AdminIdAssigner.assignUniqueId(admin));
 			em.persist(admin);
 			tx.commit();
-			EmailUtil.sendWelcomeEmail(admin.getMail(), admin.getName(), admin.getMembershipNo(), admin.getPassword());
+			//EmailUtil.sendWelcomeEmail(admin.getMail(), admin.getName(), admin.getMembershipNo(), admin.getPassword());
 			return true;
 		} catch (Exception e) {
 			if (tx.isActive()) {

@@ -80,6 +80,13 @@ body {
 	<script>
 $(document).ready(function() {
     $('#regForm').on('submit', function(e) {
+    	const name = $('#name').val();
+		const nameRegex = /^[A-Za-z\s]+$/; 
+
+		if (!nameRegex.test(name)) {
+		    showError('#name', 'Name should only contain alphabets.');
+		    isValid = false;
+		}
         
         $('.form-control').removeClass('is-invalid');
         $('.invalid-feedback').remove();

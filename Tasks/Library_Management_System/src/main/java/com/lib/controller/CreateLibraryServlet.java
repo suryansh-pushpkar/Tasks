@@ -31,8 +31,10 @@ public class CreateLibraryServlet extends HttpServlet {
 
 		Library library = new Library();
 		library.setName(libName);
-
+		currentAdmin.setLibrary(library);
 		library.setOwner(currentAdmin);
+		AdminDao Adao = new AdminDao();
+		Adao.update(currentAdmin);
 
 		try {
 			LibraryDao dao = new LibraryDao();
@@ -46,7 +48,7 @@ public class CreateLibraryServlet extends HttpServlet {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.sendRedirect("createLibrary.jsp?error=creation_failed");
+			response.sendRedirect("createlib.jsp?error=creation_failed");
 		}
 	}
 }

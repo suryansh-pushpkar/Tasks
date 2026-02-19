@@ -187,7 +187,7 @@ public class IssueRecordDao {
 	public List<IssueRecord> getAllIssuesByUser(int userId) {
 		EntityManager em = JPAUtil.getFactory().createEntityManager();
 		try {
-			
+
 			String jpql = "SELECT r FROM IssueRecord r " + "JOIN FETCH r.book b " + "JOIN FETCH b.library "
 					+ "WHERE r.user.id = :uId " + "ORDER BY r.startDate DESC";
 
@@ -195,6 +195,19 @@ public class IssueRecordDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new java.util.ArrayList<>(); // Return empty list instead of null to avoid JSP crashes
+		} finally {
+			em.close();
+		}
+	}
+
+	public java.util.Date getExpectedAvailabilityDate(int bookId) {
+		EntityManager em = JPAUtil.getFactory().createEntityManager();
+		try {
+			String jpql = "SELECT MAX(r.endDate) FROM IssueRecord r "
+					+ "WHERE r.book.id = :bId AND r.status IN ('ISSUED', 'PENDING')";
+			return em.createQuery(jpql, java.util.Date.class).setParameter("bId", bookId).getSingleResult();
+		} catch (Exception e) {
+			return null; // Book has no active issues, available now
 		} finally {
 			em.close();
 		}

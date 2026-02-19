@@ -94,39 +94,31 @@ body {
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
-		$(document)
-				.ready(
-						function() {
-							$('#adminRegForm')
-									.on('submit',function(e) {
+		$(document).ready(function() {
+							$('#adminRegForm').on('submit',function(e) {
 										const name = $('#name').val();
 										const nameRegex = /^[A-Za-z\s]+$/; 
 
-										// Name Validation
 										if (!nameRegex.test(name)) {
 										    showError('#name', 'Name should only contain alphabets.');
 										    isValid = false;
 										}
-												$('.form-control').removeClass(
-														'is-invalid');
+												$('.form-control').removeClass('is-invalid');
 												$('.invalid-feedback').remove();
 
-												const password = $('#password')
-														.val();
+												const password = $('#password').val();
 												const confirmPassword = $('#confirmPassword').val();
 												const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
 												let isValid = true;
 
-												// Password Logic
-												if (password.length < 8
-														|| !specialCharRegex.test(password)) {
+												// Password 
+												if (password.length < 8 || !specialCharRegex.test(password)) {
 													showError('#password','Password must be 8+ characters and contain a special character.');
 													isValid = false;
 												}
 
 												if (password !== confirmPassword) {
-													showError(
-															'#confirmPassword','Passwords do not match.');
+													showError('#confirmPassword','Passwords do not match.');
 													isValid = false;
 												}
 
@@ -137,8 +129,7 @@ body {
 
 							function showError(selector, message) {
 								$(selector).addClass('is-invalid');
-								$(selector).after(
-										'<div class="invalid-feedback">'
+								$(selector).after('<div class="invalid-feedback">'
 												+ message + '</div>');
 							}
 						});

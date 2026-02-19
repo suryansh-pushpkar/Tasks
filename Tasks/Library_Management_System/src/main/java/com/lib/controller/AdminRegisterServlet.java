@@ -30,23 +30,24 @@ public class AdminRegisterServlet extends HttpServlet {
 		admin.setAddress(address);
 
 		try {
-			String id =AdminIdAssigner.assignUniqueId(admin);
+			String id = AdminIdAssigner.assignUniqueId(admin);
 			admin.setMembershipNo(id);
-			EmailUtil.sendWelcomeEmail(admin.getMail(), admin.getName(), admin.getMembershipNo(), admin.getPassword());
 
 			AdminDao dao = new AdminDao();
 			if (dao.register(admin)) {
+				EmailUtil.sendWelcomeEmail(admin.getMail(), admin.getName(), admin.getMembershipNo(),
+						admin.getPassword());
 
 				HttpSession session = request.getSession();
 				session.setAttribute("currentAdmin", admin);
 				session.setAttribute("role", "ADMIN");
-				session.setMaxInactiveInterval(60 * 60*6);
+				session.setMaxInactiveInterval(60 * 60 * 6);
 				response.sendRedirect("createlib.jsp");
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.sendRedirect("register.jsp?error=RegistrationFailed");
+			response.sendRedirect("adminregister.jsp?error=RegistrationFailed");
 		}
 	}
 }
