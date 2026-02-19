@@ -9,7 +9,7 @@
 
 <%
 HttpSession currentSession = request.getSession(false);
-User user1 = (User) currentSession.getAttribute("currentUser");
+User user1 = (User) currentSession.getAttribute("User");
 String mNo = user1.getMembershipNo();
 String mail = user1.getMail();
 if (mNo == null || mail == null) {
