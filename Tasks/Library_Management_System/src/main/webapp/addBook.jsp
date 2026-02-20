@@ -11,7 +11,7 @@ if (currentLibrary == null) {
 <!DOCTYPE html>
 <html>
 <head>
-ss
+
 <%@ include file="/partials/__bootstrap.jsp"%>
 <title>Add New Book | LibManager</title>
 <style>
