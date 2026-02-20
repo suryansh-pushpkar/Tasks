@@ -26,7 +26,7 @@ public class Book {
 	@Column(nullable = false)
 	private String author;
 
-	private String isbn;
+	private long quantity;
 
 	@ManyToOne
 	@JoinColumn(name = "library_id")
@@ -35,12 +35,24 @@ public class Book {
 	@OneToMany(mappedBy = "book")
 	private List<IssueRecord> issueRecords;
 
-	public String getIsbn() {
-		return isbn;
+		private String edition;
+		
+		
+
+	public String getEdition() {
+			return edition;
+		}
+
+		public void setEdition(String edition) {
+			this.edition = edition;
+		}
+
+	public long getQuantity() {
+		return quantity;
 	}
 
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
 	}
 
 	public int getId() {

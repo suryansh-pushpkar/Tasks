@@ -50,16 +50,61 @@ public class BookDao {
 		}
 	}
 
+	public void updateQuantity(int bookId, int amount) {
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+		try {
+			Book book = em.find(Book.class, bookId);
+			if (book != null) {
+				book.setQuantity(book.getQuantity() + amount);
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+		} finally {
+			em.close();
+		}
+	}
+
 	public List<Object[]> getAllBooksWithStatus(int libId) {
 		EntityManager em = factory.createEntityManager();
 		try {
-			
+
 			String jpql = "SELECT b.name, b.author, b.isbn, "
 					+ "(SELECT r.status FROM IssueRecord r WHERE r.book.id = b.id "
 					+ "AND r.status IN ('ISSUED', 'PENDING', 'RENEW_REQUESTED') ORDER BY r.id DESC) "
 					+ "FROM Book b WHERE b.library.id = :libId";
 
 			return em.createQuery(jpql, Object[].class).setParameter("libId", libId).getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
+	public void updateBook(Book book) {
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+		try {
+			em.merge(book);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+		} finally {
+			em.close();
+		}
+	}
+
+	public void deleteBook(int id) {
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+		try {
+			Book b = em.find(Book.class, id);
+			if (b != null) {
+				em.remove(b);
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
 		} finally {
 			em.close();
 		}
@@ -145,6 +190,22 @@ public class BookDao {
 			if (tx.isActive())
 				tx.rollback();
 			throw e;
+		} finally {
+			em.close();
+		}
+	}
+
+	public List<Book> getLibraryInventory(int libId) {
+		EntityManager em = factory.createEntityManager();
+		try {
+			// We use JPQL to select the Book objects where the associated
+			// library's ID matches the logged-in admin's library ID.
+			String jpql = "SELECT b FROM Book b WHERE b.library.id = :libId";
+
+			return em.createQuery(jpql, Book.class).setParameter("libId", libId).getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new java.util.ArrayList<>();
 		} finally {
 			em.close();
 		}

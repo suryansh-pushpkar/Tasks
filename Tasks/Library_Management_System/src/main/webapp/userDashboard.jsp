@@ -6,7 +6,16 @@
 	import="com.lib.dao.UserDao, com.lib.dao.BookDao, com.lib.dao.IssueRecordDao"%>
 <%@ page import="java.util.List"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
 
+    if (session == null || ((session.getAttribute("currentUser") == null) && (session.getAttribute("User") == null))	) {
+        response.sendRedirect("index.jsp");
+        return;
+    }
+%>
 <%
 HttpSession currentSession = request.getSession(false);
 User user1 = (User) currentSession.getAttribute("User");

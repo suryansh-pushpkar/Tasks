@@ -26,12 +26,13 @@ public class CreateBookServlet extends HttpServlet {
 
 		String name = request.getParameter("name");
 		String author = request.getParameter("author");
-		String isbn = request.getParameter("isbn");
+		long quantity = Long.parseLong(request.getParameter("isbn"));
 
 		Book book = new Book();
 		book.setName(name);
 		book.setAuthor(author);
-		book.setIsbn(isbn);
+		book.setQuantity(quantity);
+		;
 		book.setLibrary(currentLibrary);
 
 		try {

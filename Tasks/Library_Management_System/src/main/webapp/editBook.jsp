@@ -61,9 +61,9 @@ body {
 							class="form-control" value="<%=book.getAuthor()%>" required>
 					</div>
 					<div class="form-group">
-						<label>ISBN</label> <input type="text" name="newIsbn"
+						<label>Quantity</label> <input type="text" name="newIsbn"
 							class="form-control"
-							value="<%=(book.getIsbn() != null) ? book.getIsbn() : ""%>">
+							value="<%=(book.getQuantity() != 0) ? book.getQuantity() : "" %>">
 					</div>
 
 					<button type="submit"

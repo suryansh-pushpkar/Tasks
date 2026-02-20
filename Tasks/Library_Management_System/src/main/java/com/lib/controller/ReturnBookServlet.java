@@ -1,5 +1,6 @@
 package com.lib.controller;
 
+import com.lib.dao.BookDao;
 import com.lib.dao.IssueRecordDao;
 import com.lib.entity.IssueRecord;
 import jakarta.servlet.ServletException;
@@ -20,9 +21,14 @@ public class ReturnBookServlet extends HttpServlet {
 
 		int id = Integer.parseInt(idStr);
 		IssueRecordDao dao = new IssueRecordDao();
+		IssueRecord record = new IssueRecord();
 
 		try {
 			String resultMessage = dao.returnBook(id);
+			BookDao bDao = new BookDao();
+			bDao.updateQuantity(record.getBook().getId(), 1);
+			dao.update(record);
+			response.sendRedirect("admindashboard.jsp?msg=Book returned and stock restored");
 			response.sendRedirect("admindashboard.jsp?msg=" + resultMessage);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -3,7 +3,16 @@
 	pageEncoding="UTF-8"%>
 <%@ page
 	import="com.lib.entity.Admin, com.lib.entity.IssueRecord, com.lib.dao.IssueRecordDao, com.lib.dao.BookDao, java.util.List"%>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
 
+    if (session == null || session.getAttribute("currentAdmin") == null) {
+        response.sendRedirect("adminlogin.jsp");
+        return;
+    }
+%>
 <%
 Admin currentAdmin = (Admin) session.getAttribute("currentAdmin");
 if (currentAdmin == null) {
