@@ -36,7 +36,7 @@ public class UserRegisterServlet extends HttpServlet {
 		EmailUtil.sendWelcomeEmail(user.getMail(), user.getName(), user.getMembershipNo(), user.getPassword());
 
 		HttpSession session = request.getSession();
-		session.setAttribute("currentUser", user);
+		session.setAttribute("User", user);
 		session.setAttribute("role", user.getRole());
 		session.setMaxInactiveInterval(60 * 60 * 6);
 		response.sendRedirect("userDashboard.jsp");

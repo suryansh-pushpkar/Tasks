@@ -45,7 +45,12 @@ body {
 							class="form-control" required>
 					</div>
 					<div class="form-group">
-						<label>ISBN Number</label> <input type="text" name="isbn"
+						<label>Edition</label> <input type="text" name="edition"
+							class="form-control" required>
+					</div>
+
+					<div class="form-group">
+						<label>Quantity</label> <input type="text" name="isbn"
 							class="form-control" placeholder="e.g. 978-3-16-148410-0">
 					</div>
 					<button type="submit" class="btn btn-dark btn-block mt-4">Save

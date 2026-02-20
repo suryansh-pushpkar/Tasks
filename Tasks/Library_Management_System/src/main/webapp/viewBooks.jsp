@@ -94,7 +94,7 @@ body {
 												</c:otherwise>
 											</c:choose></td>
 										<td class="align-middle text-right pr-4"><a
-											href="editBook.jsp?id=${book.id}"
+											href="updateBook?id=${book.id}"
 											class="btn btn-sm btn-warning text-white mr-1"> <i
 												class="fas fa-edit"></i> Edit
 										</a> <a href="deleteBook?id=${book.id}"
