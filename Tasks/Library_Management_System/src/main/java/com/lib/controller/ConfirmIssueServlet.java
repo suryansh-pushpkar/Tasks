@@ -18,58 +18,44 @@ import java.util.concurrent.TimeUnit;
 
 public class ConfirmIssueServlet extends HttpServlet {
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+	        throws ServletException, IOException {
+	    
+	    try {
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	        
+	        Date userStart = sdf.parse(request.getParameter("startDate"));
+	        Date userEnd = sdf.parse(request.getParameter("endDate"));
+	        
+	        Date serverToday = new Date(); 
+	        serverToday = sdf.parse(sdf.format(serverToday)); 
 
-		HttpSession session = request.getSession(false);
-		if (session == null || session.getAttribute("User") == null) {
-			response.sendRedirect("index.jsp");
-			return;
-		}
+	        if (userStart.before(serverToday)) {
+	            response.sendRedirect("issueBook.jsp?error=Cannot pick a date in the past!");
+	            return;
+	        }
 
-		User user = (User) session.getAttribute("User");
+	        long diff = userEnd.getTime() - userStart.getTime();
+	        long days = diff / (1000 * 60 * 60 * 24);
+	        
+	        if (days > 60) {
+	            response.sendRedirect("issueBook.jsp?error=Duration exceeds 60 days limit!");
+	            return;
+	        }
 
-		try {
-			int bookId = Integer.parseInt(request.getParameter("bookId"));
-			String startDateStr = request.getParameter("startDate");
-			String endDateStr = request.getParameter("endDate");
+	        IssueRecord record = new IssueRecord();
+	        record.setBook(new BookDao().findById(Integer.parseInt(request.getParameter("bookId"))));
+	        record.setUser((User) request.getSession().getAttribute("currentUser"));
+	        record.setStartDate(userStart);
+	        record.setEndDate(userEnd);
+	        record.setStatus("PENDING");
 
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			Date startDate = sdf.parse(startDateStr);
-			Date endDate = sdf.parse(endDateStr);
+	        new IssueRecordDao().save(record);
+	        response.sendRedirect("userDashboard.jsp?msg=Request submitted for approval!");
 
-			long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
-			long diffDays = ChronoUnit.DAYS.between(startDate.toInstant(), endDate.toInstant());
-			if (endDate.before(startDate) || diffDays > 60) {
-				response.sendRedirect("issueBook.jsp?bookId=" + bookId + "&error=Invalid date range selection.");
-				return;
-			}
-
-			IssueRecordDao irDao = new IssueRecordDao();
-			long activeCount = irDao.getActiveBookCount(user.getId());
-
-			if (activeCount >= 5) {
-				response.sendRedirect("userDashboard.jsp?error=Limit Reached! Maximum 5 active requests allowed.");
-				return;
-			}
-
-			BookDao bDao = new BookDao();
-			Book book = bDao.findById(bookId);
-
-			IssueRecord record = new IssueRecord();
-			record.setBook(book);
-			record.setUser(user);
-			record.setStartDate(startDate);
-			record.setEndDate(endDate);
-			record.setStatus("PENDING");
-
-			irDao.save(record);
-
-			response.sendRedirect("userDashboard.jsp?msg=Request sent successfully for " + book.getName());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.sendRedirect("userDashboard.jsp?error=Process failed: " + e.getMessage());
-		}
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.sendRedirect("userDashboard.jsp?error=Processing error.");
+	    }
 	}
 }

@@ -3,17 +3,22 @@
 <%@ page
 	import="com.lib.entity.Book, com.lib.dao.BookDao, com.lib.dao.IssueRecordDao, java.util.Date, java.text.SimpleDateFormat"%>
 
-
 <%
 String bookIdStr = request.getParameter("bookId");
 Book book = null;
 Date nextAvailableDate = null;
+String minStartDateStr = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
 if (bookIdStr != null) {
 	int bookId = Integer.parseInt(bookIdStr);
 	book = new BookDao().findById(bookId);
 	IssueRecordDao irDao = new IssueRecordDao();
 	nextAvailableDate = irDao.getExpectedAvailabilityDate(bookId);
+
+	// If out of stock and we have a date, that becomes the minimum allowed start date
+	if (book != null && book.getQuantity() <= 0 && nextAvailableDate != null) {
+		minStartDateStr = new SimpleDateFormat("yyyy-MM-dd").format(nextAvailableDate);
+	}
 }
 
 if (book == null) {
@@ -22,18 +27,7 @@ if (book == null) {
 }
 
 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-String suggestionMsg = null;
-
-
-if (book.getQuantity() <= 0 && nextAvailableDate != null) {
-	suggestionMsg = "This book is currently out of stock. Expected back by: <strong>" + sdf.format(nextAvailableDate)
-	+ "</strong>";
-}
-
-if (book.getQuantity() <= 0) {
-	response.sendRedirect("userDashboard.jsp?error=Sorry, this book just went out of stock!");
-	return;
-}
+boolean isOutOfStock = (book.getQuantity() <= 0);
 %>
 
 <!DOCTYPE html>
@@ -66,11 +60,11 @@ body {
 	margin-bottom: 20px;
 }
 
-.suggestion-box {
-	border-left: 5px solid #17a2b8;
-	background-color: #e1f5fe;
-	padding: 10px;
+.availability-alert {
+	border-left: 5px solid;
+	padding: 12px;
 	border-radius: 5px;
+	margin-bottom: 20px;
 }
 </style>
 </head>
@@ -78,8 +72,9 @@ body {
 	<div class="container py-5">
 		<div class="card issue-card shadow-lg">
 			<div class="card-body p-4">
-				<h3 class="text-center mb-4 font-weight-bold text-primary">Request
-					Issue</h3>
+				<h3 class="text-center mb-4 font-weight-bold text-primary">
+					<%=isOutOfStock ? "Reserve Book" : "Request Issue"%>
+				</h3>
 
 				<div class="book-preview text-center">
 					<h4 class="mb-1 font-weight-bold"><%=book.getName()%></h4>
@@ -87,30 +82,24 @@ body {
 						By
 						<%=book.getAuthor()%></p>
 					<span class="badge badge-info">Edition: <%=book.getEdition()%></span>
-					<div class="mt-2">
-						<%
-						if (book.getQuantity() > 0) {
-						%>
-						<span class="text-success small font-weight-bold"><i
-							class="fas fa-check"></i> <%=book.getQuantity()%> Copies
-							Available</span>
-						<%
-						} else {
-						%>
-						<span class="text-danger small font-weight-bold"><i
-							class="fas fa-times"></i> Out of Stock</span>
-						<%
-						}
-						%>
-					</div>
 				</div>
 
 				<%
-				if (suggestionMsg != null) {
+				if (isOutOfStock) {
 				%>
-				<div class="suggestion-box mb-4 small text-info">
-					<i class="fas fa-info-circle mr-1"></i>
-					<%=suggestionMsg%>
+				<div class="availability-alert alert-warning">
+					<i class="fas fa-clock mr-2"></i> <strong>Currently Out of
+						Stock.</strong><br> Estimated available after: <span class="text-dark"><%=(nextAvailableDate != null) ? sdf.format(nextAvailableDate) : "TBD"%></span>.
+					You can still create a reservation request for this date or later.
+				</div>
+				<%
+				} else {
+				%>
+				<div class="availability-alert alert-success">
+					<i class="fas fa-check-circle mr-2"></i> <strong>Available
+						Now!</strong><br> There are
+					<%=book.getQuantity()%>
+					copies ready for immediate issue.
 				</div>
 				<%
 				}
@@ -118,12 +107,15 @@ body {
 
 				<form action="confirmIssueAction" method="POST" id="issueForm">
 					<input type="hidden" name="bookId" value="<%=book.getId()%>">
+
 					<div class="row">
 						<div class="col-md-6">
 							<div class="form-group">
 								<label class="font-weight-bold">Start Date</label> <input
 									type="date" name="startDate" id="startDate"
-									class="form-control" required>
+									class="form-control" min="<%=minStartDateStr%>"
+									value="<%=minStartDateStr%>" required> <small
+									class="text-muted">Earliest possible date</small>
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -142,9 +134,8 @@ body {
 							<a href="userDashboard.jsp" class="btn btn-light btn-block">Cancel</a>
 						</div>
 						<div class="col-6">
-							<button type="submit" class="btn btn-primary btn-block"
-								<%=(book.getQuantity() <= 0) ? "disabled" : ""%>>
-								<%=(book.getQuantity() <= 0) ? "Unavailable" : "Request Issue"%>
+							<button type="submit" class="btn btn-primary btn-block">
+								<%=isOutOfStock ? "Request Reservation" : "Request Issue"%>
 							</button>
 						</div>
 					</div>
@@ -157,29 +148,36 @@ body {
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
     const errorDiv = document.getElementById('dateError');
-    const today = new Date().toISOString().split('T')[0];
     
+    const today = new Date().toISOString().split('T')[0];
     startDateInput.setAttribute('min', today);
-    startDateInput.addEventListener('change', () => { endDateInput.setAttribute('min', startDateInput.value); });
+
+    startDateInput.addEventListener('change', () => { 
+        endDateInput.setAttribute('min', startDateInput.value); 
+    });
 
     document.getElementById('issueForm').onsubmit = function(e) {
         const start = new Date(startDateInput.value);
         const end = new Date(endDateInput.value);
-        const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        
+        const diffTime = end - start;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
         errorDiv.classList.add('d-none');
+        
         if (end <= start) {
             errorDiv.textContent = "Return date must be after start date.";
             errorDiv.classList.remove('d-none');
             return false;
         }
+        
         if (diffDays > 60) {
-            errorDiv.textContent = "Maximum duration is 60 days.";
+            errorDiv.textContent = "Maximum duration for reservation is 60 days.";
             errorDiv.classList.remove('d-none');
             return false;
         }
         return true;
     };
-    </script>
+</script>
 </body>
 </html>

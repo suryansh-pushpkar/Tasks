@@ -1,5 +1,6 @@
 package com.lib.dao;
 
+import java.time.LocalDate;
 import java.util.List;
 import com.lib.entity.Book;
 import com.lib.util.JPAUtil;
@@ -81,36 +82,49 @@ public class BookDao {
 		}
 	}
 
+	public LocalDate getNextAvailableDate(int bookId) {
+		EntityManager em = factory.createEntityManager();
+		try {
+			String jpql = "SELECT MIN(i.endDate) FROM IssueRecord i "
+					+ "WHERE i.book.id = :bid AND i.status = 'ISSUED'";
+			LocalDate date = em.createQuery(jpql, LocalDate.class).setParameter("bid", bookId).getSingleResult();
+
+			
+			return (date == null) ? LocalDate.now() : date.plusDays(1);
+		} finally {
+			em.close();
+		}
+	}
+
 	public void updateBook(Book book) {
-	    EntityManager em = factory.createEntityManager();
-	    try {
-	        em.getTransaction().begin();
-	        
-	        // 1. Fetch the LIVE entity from the database using the ID
-	        Book dbBook = em.find(Book.class, book.getId());
-	        
-	        if (dbBook != null) {
-	            // 2. Map the updated values from your form (book) to the database object (dbBook)
-	            dbBook.setName(book.getName());
-	            dbBook.setAuthor(book.getAuthor());
-	            dbBook.setEdition(book.getEdition());
-	            dbBook.setQuantity(book.getQuantity());
-	            
-	            // 3. Commit the transaction
-	            // Dirty Checking will automatically detect changes in 'dbBook' and push the SQL UPDATE
-	            em.getTransaction().commit();
-	            System.out.println("DEBUG: Database updated for ID " + book.getId());
-	        } else {
-	            System.out.println("DEBUG: Book not found in DB for ID " + book.getId());
-	        }
-	    } catch (Exception e) {
-	        if (em.getTransaction().isActive()) {
-	            em.getTransaction().rollback();
-	        }
-	        e.printStackTrace();
-	    } finally {
-	        em.close();
-	    }
+		EntityManager em = factory.createEntityManager();
+		try {
+			em.getTransaction().begin();
+
+			Book dbBook = em.find(Book.class, book.getId());
+
+			if (dbBook != null) {
+				
+				dbBook.setName(book.getName());
+				dbBook.setAuthor(book.getAuthor());
+				dbBook.setEdition(book.getEdition());
+				dbBook.setQuantity(book.getQuantity());
+
+			
+				// UPDATE
+				em.getTransaction().commit();
+				System.out.println("DEBUG: Database updated for ID " + book.getId());
+			} else {
+				System.out.println("DEBUG: Book not found in DB for ID " + book.getId());
+			}
+		} catch (Exception e) {
+			if (em.getTransaction().isActive()) {
+				em.getTransaction().rollback();
+			}
+			e.printStackTrace();
+		} finally {
+			em.close();
+		}
 	}
 
 	public void deleteBook(int id) {
