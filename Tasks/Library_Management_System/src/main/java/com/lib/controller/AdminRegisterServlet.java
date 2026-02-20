@@ -43,6 +43,8 @@ public class AdminRegisterServlet extends HttpServlet {
 				session.setAttribute("role", "ADMIN");
 				session.setMaxInactiveInterval(60 * 60 * 6);
 				response.sendRedirect("createlib.jsp");
+			} else {
+				response.sendRedirect("adminregister.jsp?error=RegistrationFailed");
 			}
 
 		} catch (Exception e) {
