@@ -31,6 +31,8 @@ public class Book {
 	@ManyToOne
 	@JoinColumn(name = "library_id")
 	private Library library;
+	
+	private String parkingSlot;
 
 	@OneToMany(mappedBy = "book")
 	private List<IssueRecord> issueRecords;
