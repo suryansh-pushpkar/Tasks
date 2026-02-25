@@ -1,14 +1,13 @@
-package com.product;
+package com.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ProductMicroServiceApplication {
+public class UserMicroServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProductMicroServiceApplication.class, args);
-		System.out.println("Product Micro-service Started");
+		SpringApplication.run(UserMicroServiceApplication.class, args);
 	}
 
 }
