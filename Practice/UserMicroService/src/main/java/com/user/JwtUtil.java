@@ -16,8 +16,12 @@ public class JwtUtil {
 	private final String SECRETKEY = "MyNameIsSuryanshPushpkarWorkingAtWebkorps";
 
 	public String generateToken(UserDetails user) {
-		String token = Jwts.builder().setSubject(user.getUsername()).setClaims(Map.of("role", user.getAuthorities()))
-				.setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
+		
+		String token = Jwts.builder()
+				.setSubject(user.getUsername())
+				.setClaims(Map.of("role", user.getAuthorities()))
+				.setIssuedAt(new Date())
+				.setExpiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
 				.signWith(Keys.hmacShaKeyFor(SECRETKEY.getBytes()), SignatureAlgorithm.HS256).compact();
 		return token;
 	}

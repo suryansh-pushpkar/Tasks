@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.user.dto.UserDTO;
 import com.user.entity.User;
 import com.user.repo.UserRepository;
+import com.user.utility.EmailUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -18,6 +19,7 @@ public class UserService {
    }
    @Transactional
    public UserDTO registerUser(User user) {
+	   
 	   String encryptedPassword = passwordEncoder.encode(user.getPassword());
 	   user.setPassword(encryptedPassword);
 	   User dbUser =  userRepo.save(user);

@@ -25,7 +25,7 @@ public class Product {
 	private float discountPercentage;
 	private float rating;
 	private int stock;
-	
+
 	// Specific Category Name from Category Micro-Service
 	private String category;
 	@Column(name = "warranty_information")

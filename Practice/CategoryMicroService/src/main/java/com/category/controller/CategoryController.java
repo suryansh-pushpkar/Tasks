@@ -24,6 +24,12 @@ public class CategoryController {
 	   this.categoryService = categoryService;
    }
    
+   @GetMapping("/save-dummy-categories")
+   public ResponseEntity<?> saveExternalCategories(){
+	   return ResponseEntity.ok(categoryService.saveExtenalCategories());
+   }
+   
+   
    @PostMapping("/save")
    public ResponseEntity<?> saveInBulk(@RequestBody List<String> list){
 	   return ResponseEntity.ok(categoryService.saveInBulk(list));
@@ -43,8 +49,8 @@ public class CategoryController {
 	   return ResponseEntity.ok(categoryService.deleteById(id));
    }
    
-//   @GetMapping("/product")
-//   public ResponseEntity<?> fetchProduct(@RequestParam("category") String category){
-//	   return ResponseEntity.ok(categoryService.fetchProduct(category));
-//   }
+   @GetMapping("/product/{category}")
+   public ResponseEntity<?> fetchProduct(@RequestParam String category){
+	   return ResponseEntity.ok(categoryService.getProductByCategoryName(category));
+   }
 }
