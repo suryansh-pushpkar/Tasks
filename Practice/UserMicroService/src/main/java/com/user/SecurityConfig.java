@@ -16,7 +16,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) {
 		http.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth", "/auth/signin", "/auth/verify").permitAll());
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth", "/auth/signin", "/auth/verify","/auth/refresh").permitAll());
 		return http.build();
 	}
 	

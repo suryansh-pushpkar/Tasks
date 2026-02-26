@@ -1,6 +1,7 @@
 package com.user.controller;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.user.JwtUtil;
 import com.user.dto.OtpRequest;
 import com.user.dto.UserDTO;
+import com.user.entity.RefreshToken;
 import com.user.entity.User;
+import com.user.service.RefreshTokenService;
 import com.user.service.UserService;
 import com.user.utility.EmailUtil;
 import com.user.utility.OtpGenerator;
@@ -28,15 +31,17 @@ public class AuthController {
 	private final AuthenticationManager authenticationManager;
 	private final UserDetailsService detailsService;
 	private final JwtUtil jwt;
+	private final RefreshTokenService refreshTokenService;
 
 	private final HashMap<String, User> temporaryStorage = new HashMap<>();
 
 	public AuthController(UserService userService, AuthenticationManager authenticationManager,
-			UserDetailsService detailsService, JwtUtil jwt) {
+			UserDetailsService detailsService, JwtUtil jwt, RefreshTokenService refreshTokenService) {
 		this.userService = userService;
 		this.authenticationManager = authenticationManager;
 		this.detailsService = detailsService;
 		this.jwt = jwt;
+		this.refreshTokenService = refreshTokenService;
 	}
 
 	@PostMapping
@@ -55,11 +60,13 @@ public class AuthController {
 				UserDTO savedUser = userService.registerUser(user);
 				temporaryStorage.remove(request.getEmail());
 				UserDetails userDetails = detailsService.loadUserByUsername(user.getEmail());
+				RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
 				String token = jwt.generateToken(userDetails);
 				HashMap<String, Object> hm = new HashMap<>();
 				hm.put("message", "Sign in success");
 				hm.put("token", token);
 				hm.put("User", savedUser);
+				hm.put("refreshToken", refreshToken);
 				return ResponseEntity.ok(hm);
 			}
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Session expired.");
@@ -77,5 +84,26 @@ public class AuthController {
 		hm.put("message", "Sign in success");
 		hm.put("token", token);
 		return ResponseEntity.ok(hm);
+	}
+
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> request) {
+		String requestToken = request.get("refreshToken");
+
+		RefreshToken refreshToken = refreshTokenService.findByToken(requestToken)
+				.orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
+		refreshTokenService.verifyExpiration(refreshToken);
+
+		User user = refreshToken.getUser();
+
+		UserDetails userDetails = detailsService.loadUserByUsername(user.getEmail());
+
+		String newJwtToken = jwt.generateToken(userDetails);
+
+		HashMap<String, String> response = new HashMap<>();
+		response.put("accessToken", newJwtToken);
+		response.put("refreshToken", requestToken);
+
+		return ResponseEntity.ok(response);
 	}
 }
