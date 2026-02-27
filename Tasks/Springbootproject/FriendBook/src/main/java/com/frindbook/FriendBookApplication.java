@@ -4,11 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoApplication {
+public class FriendBookApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
-		System.out.println("FriendBook Started");
+		SpringApplication.run(FriendBookApplication.class, args);
+		System.out.println("Friend Book Application Started");
 	}
 
 }
