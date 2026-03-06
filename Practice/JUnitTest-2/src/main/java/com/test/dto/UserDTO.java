@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class UserDTO {
 	private int id;
-	private int name;
+	private String name;
 	private String mail;
 	private Date date;
 	
@@ -15,10 +15,11 @@ public class UserDTO {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getName() {
+	
+	public String getName() {
 		return name;
 	}
-	public void setName(int name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 	public String getMail() {
