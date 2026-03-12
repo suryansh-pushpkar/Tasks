@@ -43,7 +43,7 @@ public class User implements UserDetails {
 
 	@Column(unique = true)
 	private String username;
-	private String profileImage = "default.png";
+	private String profileImage = "porfile.png";
 	private String favSongs;
 	private String favBooks;
 	private String favPlaces;
