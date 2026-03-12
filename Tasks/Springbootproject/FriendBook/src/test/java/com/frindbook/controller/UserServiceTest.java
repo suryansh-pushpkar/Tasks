@@ -37,9 +37,6 @@ public class UserServiceTest {
 
     @Test
     public void registerUser(){
-
-//        When(userRepository.save(hmentMatchers.anyString()))
-
         User user = new User();
         when(modelMapper.map(any(), any())).thenReturn(user);
         when(userRepository.save(any())).thenReturn(user);
