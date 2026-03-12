@@ -1,5 +1,6 @@
 package com.frindbook.service;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,13 @@ public class UserService {
 	  @Transactional
 	   public UserDTO registerUser(User user) {
 		   
-		   String encryptedPassword = passwordEncoder.encode(user.getPassword());
-		   user.setPassword(encryptedPassword);
+		 //  String encryptedPassword = passwordEncoder.encode(user.getPassword());
+		//   user.setPassword(encryptedPassword);
+		  user.setPassword(user.getPassword());
 		   User dbUser =  userRepo.save(user);
 		   UserDTO dto = new UserDTO();
-		   dto.setEmail(dbUser.getEmail());
+		  ModelMapper modelMapper = new ModelMapper();
+		  modelMapper.map(dbUser,dto);
 		   return dto;
 	   }
 	
