@@ -24,9 +24,10 @@ public class UserService {
 	  @Transactional
 	   public UserDTO registerUser(User user) {
 		   
-		 //  String encryptedPassword = passwordEncoder.encode(user.getPassword());
-		//   user.setPassword(encryptedPassword);
-		  user.setPassword(user.getPassword());
+		   String encryptedPassword = passwordEncoder.encode(user.getPassword());
+		   user.setPassword(encryptedPassword);
+		  //Written for Testing purpose
+		 //  user.setPassword(user.getPassword());
 		   User dbUser =  userRepo.save(user);
 		   UserDTO dto = new UserDTO();
 		  ModelMapper modelMapper = new ModelMapper();
