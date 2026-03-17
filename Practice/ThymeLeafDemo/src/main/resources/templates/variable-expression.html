@@ -5,9 +5,14 @@
     <title>User Details</title>
 </head>
 <body>
-<p>Username: <strong th:text="${user.username}"></strong></p>
-<p>Email: <strong th:text="${user.email}"></strong></p>
-<p>Password: <strong th:text="${user.password}"></strong></p>
-<p>Role: <strong th:text="${user.role}"></strong></p>
+
+<div class="class" th:object="${user}">
+    <p>Username: <strong th:text="*{username}"></strong></p>
+    <p>Email: <strong th:text="*{email}"></strong></p>
+    <p>Password: <strong th:text="*{password}"></strong></p>
+    <p>Role: <strong th:text="*{role}"></strong></p>
+
+</div>
+
 </body>
 </html>
