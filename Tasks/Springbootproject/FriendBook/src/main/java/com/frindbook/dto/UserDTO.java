@@ -1,41 +1,50 @@
 package com.frindbook.dto;
 
 public class UserDTO {
-	public String captcha;
-	public String fullName;
-	public String password;
-	public String email;
+    private String captcha;
+    private String fullName;
+    private String password;
+    private String email;
+    private String captchaToken;
 
-	public String getCaptcha() {
-		return captcha;
-	}
+    public String getCaptchaToken() {
+        return captchaToken;
+    }
 
-	public void setCaptcha(String captcha) {
-		this.captcha = captcha;
-	}
+    public void setCaptchaToken(String captchaToken) {
+        this.captchaToken = captchaToken;
+    }
 
-	public String getFullName() {
-		return fullName;
-	}
+    public String getCaptcha() {
+        return captcha;
+    }
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+    public void setCaptcha(String captcha) {
+        this.captcha = captcha;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
 }
