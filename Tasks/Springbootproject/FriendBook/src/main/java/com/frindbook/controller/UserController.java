@@ -35,13 +35,15 @@ public class UserController {
         if (!captchaVerified) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new SignupResponse(false, "Something Went Wrong!\n\t Please try again later ."));
-        User user = modelMapper.map(dto, User.class);
-
-        UserDTO ok = userService.registerUser(user);
-        if (ok != null) {
-            return ResponseEntity.ok(new SignupResponse(true, "Signed up successfully!"));
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new SignupResponse(false, "User with this Email address already exists."));
         }
+           User user = modelMapper.map(dto, User.class);
+
+            UserDTO ok = userService.registerUser(user);
+            if (ok != null) {
+                return ResponseEntity.ok(new SignupResponse(true, "Signed up successfully!"));
+            } else {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(new SignupResponse(false, "User with this Email address already exists."));
+            }
+        }
+       
     }
-}
