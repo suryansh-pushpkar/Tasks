@@ -40,10 +40,10 @@ public class UserController {
 
             UserDTO ok = userService.registerUser(user);
             if (ok != null) {
-                return ResponseEntity.ok(new SignupResponse(true, "Signed up successfully!"));
+                return ResponseEntity.ok(new SignupResponse(true, "You Signed Up Successfully!"));
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(new SignupResponse(false, "User with this Email address already exists."));
             }
         }
-       
+
     }
