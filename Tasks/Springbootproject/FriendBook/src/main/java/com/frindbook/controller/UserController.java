@@ -7,43 +7,41 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.frindbook.entity.User;
 import com.frindbook.service.UserService;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/auth")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private CaptchaUtil captchaUtility;
-
-    @Autowired
     private ModelMapper modelMapper;
 
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(@RequestBody UserDTO dto) {
-
-        boolean captchaVerified = captchaUtility.verifyCaptcha(dto.getCaptchaToken());
+        boolean captchaVerified = CaptchaUtil.verifyCaptcha(dto.getCaptchaToken());
         if (!captchaVerified) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new SignupResponse(false, "Something Went Wrong!\n\t Please try again later ."));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new SignupResponse(false, "Security Check Failed: Bot activity detected."));
         }
-           User user = modelMapper.map(dto, User.class);
+        try {
 
-            UserDTO ok = userService.registerUser(user);
-            if (ok != null) {
-                return ResponseEntity.ok(new SignupResponse(true, "You Signed Up Successfully!"));
+            User user = modelMapper.map(dto, User.class);
+            UserDTO registeredUser = userService.registerUser(user);
+            if (registeredUser != null) {
+                return ResponseEntity.ok(new SignupResponse(true, "Registration Successful! Welcome to FriendBook."));
             } else {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(new SignupResponse(false, "User with this Email address already exists."));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new SignupResponse(false, "Registration failed. Please check your details."));
             }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new SignupResponse(false, "An account with this email already exists."));
         }
-
     }
+}

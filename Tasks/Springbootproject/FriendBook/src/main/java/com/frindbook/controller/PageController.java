@@ -15,7 +15,7 @@ public class PageController {
     public String showLoginPage() {
         return "login";
     }
-    
+
     @GetMapping("/about")
     public String showAboutPage() {
         return "about";
