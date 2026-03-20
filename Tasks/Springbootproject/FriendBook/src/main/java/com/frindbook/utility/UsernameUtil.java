@@ -9,7 +9,7 @@ public class UsernameUtil {
 
         while (cleanName.length() < 5) {
             cleanName += "x";
-        }w
+        }
         String part1 = cleanName.substring(0, 1).toUpperCase() +
                 cleanName.substring(1, 5).toLowerCase();
         String finalUsername;

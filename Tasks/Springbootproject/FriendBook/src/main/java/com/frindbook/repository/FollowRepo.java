@@ -3,13 +3,14 @@ package com.frindbook.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.frindbook.entity.Follow;
 import com.frindbook.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface FollowRepo<Follow> extends JpaRepository<Follow, Long> {
+public interface FollowRepo extends JpaRepository<Follow, Long> {
 
 
     long countByFollower(User follower);
