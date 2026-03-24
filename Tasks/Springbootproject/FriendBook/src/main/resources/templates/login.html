@@ -42,15 +42,11 @@
         <div id="loginMessage" class="mt-3 small text-center"></div>
 
         <div th:if="${param.error}" class="alert alert-danger py-2 small text-center" role="alert">
-            Invalid email or password.
+            Either email or password is incorrect try again
         </div>
 
         <div th:if="${param.logout}" class="alert alert-info py-2 small text-center" role="alert">
             You have been logged out.
-        </div>
-
-        <div th:if="${param.signup}" class="alert alert-success py-2 small text-center" role="alert">
-            Account created successfully! Please log in.
         </div>
 
         <div class="text-center mt-4">

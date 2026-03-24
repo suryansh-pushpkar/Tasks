@@ -25,10 +25,10 @@ $(document).ready(function () {
                         signupForm.find('button').prop('disabled', true).text('Processing...');
                     },
                     success: function (response) {
-                        messageDiv.html(`<div class="alert alert-success">${response.message}</div>`);
+                        messageDiv.html('<div class="alert alert-success">Account created successfully. Redirecting to the login page...</div>');
                         setTimeout(() => {
-                            window.location.href = '/login?signup=success';
-                        }, 1500);
+                            window.location.href = '/login';
+                        }, 1800);
                     },
                     error: function (xhr) {
                         signupForm.find('button').prop('disabled', false).text('Sign Up');

@@ -8,6 +8,7 @@ import com.frindbook.utility.JwtUtil;
 
 import java.util.Map;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,7 @@ public class UserController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/signup")
+    @RateLimiter(name = "authLimiter", fallbackMethod = "signupRateLimitFallback")
     public ResponseEntity<SignupResponse> signup(@RequestBody UserDTO dto) {
         boolean captchaVerified = CaptchaUtil.verifyCaptcha(dto.getCaptchaToken());
         if (!captchaVerified) {
@@ -54,6 +56,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    @RateLimiter(name = "authLimiter", fallbackMethod = "loginRateLimitFallback")
     public ResponseEntity<?> userLogin(@RequestBody UserLoginDTO dto) {
         User user = userService.authenticateUser(dto.getEmail(), dto.getPassword());
         if (user != null) {
@@ -65,7 +68,17 @@ public class UserController {
                     "redirectUrl", "/profile/" + user.getUserName()));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Invalid email or password"));
+                    .body(Map.of("message", "Either email or password is incorrect try again"));
         }
+    }
+
+    public ResponseEntity<SignupResponse> signupRateLimitFallback(UserDTO dto, Throwable t) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new SignupResponse(false, "Too many attempts. Please try again after 2 minutes."));
+    }
+
+    public ResponseEntity<Map<String, String>> loginRateLimitFallback(UserLoginDTO dto, Throwable t) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of("message", "Too many attempts. Please try again after 2 minutes."));
     }
 }

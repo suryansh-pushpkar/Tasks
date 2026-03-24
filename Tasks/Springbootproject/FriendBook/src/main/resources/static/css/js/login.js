@@ -30,7 +30,9 @@ $(document).ready(function () {
             },
             error: function (xhr) {
                 loginForm.find('button').prop('disabled', false).text('Log In');
-                const errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Login failed.';
+                const errorMsg = xhr.responseJSON
+                    ? xhr.responseJSON.message
+                    : 'Either email or password is incorrect try again';
                 messageDiv.html(`<div class="alert alert-danger">${errorMsg}</div>`);
             }
         });
