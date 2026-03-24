@@ -48,6 +48,10 @@ public class User implements UserDetails {
 	private String favBooks;
 	private String favPlaces;
 
+	public String getUserName() {
+		return username;
+	}
+
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Post> posts;
 

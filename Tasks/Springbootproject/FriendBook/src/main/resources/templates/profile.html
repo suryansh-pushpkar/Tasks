@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Profile | FriendBook</title>
+    <th:block th:replace="~{fragments/styles :: common-head}"></th:block>
+    <style>
+        .profile-shell {
+            padding: 48px 0 64px;
+        }
+        .profile-card {
+            border: 1px solid #dbdbdb;
+            border-radius: 24px;
+            background: #fff;
+            padding: 32px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+        }
+        .profile-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #f09433, #dc2743);
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+        .profile-stat {
+            border-radius: 18px;
+            background: #f8f9fa;
+            padding: 16px;
+            text-align: center;
+        }
+        .profile-section {
+            border-radius: 18px;
+            background: #fff7f8;
+            padding: 18px;
+            height: 100%;
+        }
+        .profile-label {
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: header}"></div>
+
+<main class="profile-shell">
+    <div class="container">
+        <div class="profile-card">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-4 text-center">
+                    <div class="profile-avatar" th:text="${user.userName != null && !user.userName.isEmpty() ? user.userName.substring(0, 1) : 'F'}">F</div>
+                    <h1 class="h3 fw-bold mb-1" th:text="${user.userName}">Friend123</h1>
+                    <p class="text-muted mb-0" th:text="${user.email}">user@example.com</p>
+                </div>
+                <div class="col-lg-8">
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-4">
+                            <div class="profile-stat">
+                                <div class="h4 mb-1" th:text="${user.posts != null ? user.posts.size() : 0}">0</div>
+                                <div class="text-muted">Posts</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="profile-stat">
+                                <div class="h4 mb-1" th:text="${user.followers != null ? user.followers.size() : 0}">0</div>
+                                <div class="text-muted">Followers</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="profile-stat">
+                                <div class="h4 mb-1" th:text="${user.following != null ? user.following.size() : 0}">0</div>
+                                <div class="text-muted">Following</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="profile-section">
+                                <div class="profile-label">Full Name</div>
+                                <div th:text="${user.fullName}">Friend Book</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="profile-section">
+                                <div class="profile-label">Favorite Songs</div>
+                                <div th:text="${user.favSongs != null && !user.favSongs.isEmpty() ? user.favSongs : 'Add your favorite songs'}">Add your favorite songs</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="profile-section">
+                                <div class="profile-label">Favorite Books</div>
+                                <div th:text="${user.favBooks != null && !user.favBooks.isEmpty() ? user.favBooks : 'Add your favorite books'}">Add your favorite books</div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="profile-section">
+                                <div class="profile-label">Favorite Places</div>
+                                <div th:text="${user.favPlaces != null && !user.favPlaces.isEmpty() ? user.favPlaces : 'Add your favorite places'}">Add your favorite places</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

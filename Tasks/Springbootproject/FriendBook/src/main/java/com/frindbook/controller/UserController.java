@@ -2,7 +2,12 @@ package com.frindbook.controller;
 
 import com.frindbook.dto.SignupResponse;
 import com.frindbook.dto.UserDTO;
+import com.frindbook.dto.UserLoginDTO;
 import com.frindbook.utility.CaptchaUtil;
+import com.frindbook.utility.JwtUtil;
+
+import java.util.Map;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +26,9 @@ public class UserController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(@RequestBody UserDTO dto) {
@@ -42,6 +50,22 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new SignupResponse(false, "An account with this email already exists."));
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> userLogin(@RequestBody UserLoginDTO dto) {
+        User user = userService.authenticateUser(dto.getEmail(), dto.getPassword());
+        if (user != null) {
+            String token = jwtUtil.generateToken(user.getUserName());
+            return ResponseEntity.ok().body(Map.of(
+                    "token", token,
+                    "message", "Login successful",
+                    "username", user.getUserName(),
+                    "redirectUrl", "/profile/" + user.getUserName()));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid email or password"));
         }
     }
 }

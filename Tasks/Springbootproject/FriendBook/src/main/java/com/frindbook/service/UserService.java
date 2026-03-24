@@ -1,5 +1,7 @@
 package com.frindbook.service;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,5 +29,20 @@ public class UserService {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User dbUser = userRepo.save(user);
 		return modelMapper.map(dbUser, UserDTO.class);
+	}
+
+	public User authenticateUser(String email, String password) {
+		Optional<User> userOpt = userRepo.findByEmail(email);
+		if (userOpt.isPresent()) {
+			User user = userOpt.get();
+			if (passwordEncoder.matches(password, user.getPassword())) {
+				return user;
+			}
+		}
+		return null;
+	}
+
+	public Optional<User> findByUsername(String username) {
+		return userRepo.findByUsername(username);
 	}
 }
