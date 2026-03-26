@@ -1,4 +1,4 @@
-package com.frindbook.utility;
+package com.friendbook.utility;
 
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;

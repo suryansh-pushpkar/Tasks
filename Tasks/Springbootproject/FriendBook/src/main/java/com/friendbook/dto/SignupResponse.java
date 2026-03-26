@@ -1,4 +1,4 @@
-package com.frindbook.dto;
+package com.friendbook.dto;
 
 public class SignupResponse {
 

@@ -1,4 +1,4 @@
-package com.frindbook.entity;
+package com.friendbook.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,10 +43,14 @@ public class User implements UserDetails {
 
 	@Column(unique = true)
 	private String username;
-	private String profileImage = "default.png";
+	private String profileImage = "porfile.png";
 	private String favSongs;
 	private String favBooks;
 	private String favPlaces;
+
+	public String getUserName() {
+		return username;
+	}
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Post> posts;

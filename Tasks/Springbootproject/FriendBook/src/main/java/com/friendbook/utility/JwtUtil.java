@@ -1,4 +1,4 @@
-package com.frindbook.utility;
+package com.friendbook.utility;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

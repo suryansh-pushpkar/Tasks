@@ -1,4 +1,4 @@
-package com.frindbook;
+package com.friendbook;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

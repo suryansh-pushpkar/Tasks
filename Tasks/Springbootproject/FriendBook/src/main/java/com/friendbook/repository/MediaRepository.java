@@ -1,8 +1,8 @@
-package com.frindbook.repository;
+package com.friendbook.repository;
 import java.util.List;
 
-import com.frindbook.entity.Media;
-import com.frindbook.entity.Post;
+import com.friendbook.entity.Media;
+import com.friendbook.entity.Post;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

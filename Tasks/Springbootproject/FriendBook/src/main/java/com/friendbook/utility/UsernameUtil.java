@@ -1,6 +1,6 @@
-package com.frindbook.utility;
+package com.friendbook.utility;
 
-import com.frindbook.repository.UserRepository;
+import com.friendbook.repository.UserRepository;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class UsernameUtil {

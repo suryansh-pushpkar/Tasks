@@ -1,9 +1,9 @@
-package com.frindbook.controller;
+package com.friendbook.controller;
 
-import com.frindbook.dto.UserDTO;
-import com.frindbook.entity.User;
-import com.frindbook.repository.UserRepository;
-import com.frindbook.service.UserService;
+import com.friendbook.dto.UserDTO;
+import com.friendbook.entity.User;
+import com.friendbook.repository.UserRepository;
+import com.friendbook.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

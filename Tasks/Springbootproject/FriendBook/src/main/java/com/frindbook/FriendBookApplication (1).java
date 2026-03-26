@@ -1,4 +1,4 @@
-package com.friendbook;
+package com.frindbook;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

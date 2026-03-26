@@ -1,7 +1,7 @@
-package com.frindbook.repository;
+package com.friendbook.repository;
 
-import com.frindbook.entity.FriendRequest;
-import com.frindbook.entity.User;
+import com.friendbook.entity.FriendRequest;
+import com.friendbook.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

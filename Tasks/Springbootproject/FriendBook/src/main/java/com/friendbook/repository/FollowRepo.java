@@ -1,10 +1,10 @@
-package com.frindbook.repository;
+package com.friendbook.repository;
 
 import java.util.List;
 import java.util.Optional;
 
-import com.frindbook.entity.Follow;
-import com.frindbook.entity.User;
+import com.friendbook.entity.Follow;
+import com.friendbook.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

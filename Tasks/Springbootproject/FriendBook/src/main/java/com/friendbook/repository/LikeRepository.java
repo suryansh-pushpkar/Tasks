@@ -1,8 +1,8 @@
-package com.frindbook.repository;
+package com.friendbook.repository;
 
-import com.frindbook.entity.Post;
-import com.frindbook.entity.PostLike;
-import com.frindbook.entity.User;
+import com.friendbook.entity.Post;
+import com.friendbook.entity.PostLike;
+import com.friendbook.entity.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
