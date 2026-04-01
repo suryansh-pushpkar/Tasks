@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home | FriendBook</title>
+    <th:block th:replace="~{fragments/styles :: common-head}"></th:block>
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/navbar :: header}"></div>
+
+<main class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <section class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <div class="text-muted small">Logged in as</div>
+                            <div class="fw-bold" th:text="${currentUser.userName}">Friend123</div>
+                        </div>
+                        <a class="btn btn-outline-dark btn-sm" th:href="@{/profile}">Profile</a>
+                    </div>
+
+                    <form th:action="@{/posts}" method="post" enctype="multipart/form-data" class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Create a post</label>
+                            <input class="form-control" type="file" name="imageFile" accept="image/*" required>
+                        </div>
+                        <div class="col-12">
+                            <textarea class="form-control" name="caption" rows="3" placeholder="Write a caption"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100" type="submit">Share Post</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Search users</h2>
+                    <form method="get" th:action="@{/home}" class="input-group mb-3">
+                        <input class="form-control" type="text" name="q" placeholder="Search username" th:value="${searchQuery}">
+                        <button class="btn btn-outline-primary" type="submit">Search</button>
+                    </form>
+
+                    <div th:if="${searchResults == null or searchResults.isEmpty()}" class="text-muted small">
+                        Search results will appear here.
+                    </div>
+
+                    <div th:each="result : ${searchResults}" class="border rounded-3 p-3 mb-2 bg-light">
+                        <div class="fw-semibold" th:text="${result.userName}">Friend123</div>
+                        <div class="text-muted small mb-2" th:text="${result.fullName}">Friend Book</div>
+                        <a class="btn btn-sm btn-dark" th:href="@{|/users/${result.userName}|}">Open profile</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Notifications</h2>
+                    <div th:if="${notifications == null or notifications.isEmpty()}" class="text-muted small">
+                        No pending friend requests.
+                    </div>
+
+                    <div th:each="notification : ${notifications}" class="border rounded-3 p-3 mb-3 bg-light">
+                        <div class="fw-semibold mb-1" th:text="${notification.sender.userName}">Friend123</div>
+                        <div class="text-muted small mb-3">sent you a friend request.</div>
+                        <div class="d-flex gap-2">
+                            <form th:action="@{|/requests/${notification.id}/respond|}" method="post">
+                                <input type="hidden" name="action" value="accept">
+                                <button class="btn btn-sm btn-primary" type="submit">Accept</button>
+                            </form>
+                            <form th:action="@{|/requests/${notification.id}/respond|}" method="post">
+                                <input type="hidden" name="action" value="follow_back">
+                                <button class="btn btn-sm btn-outline-dark" type="submit">Follow Back</button>
+                            </form>
+                            <form th:action="@{|/requests/${notification.id}/respond|}" method="post">
+                                <input type="hidden" name="action" value="decline">
+                                <button class="btn btn-sm btn-outline-secondary" type="submit">Decline</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-lg-8">
+            <section class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h4 mb-0">Feed</h1>
+                        <span class="text-muted small">Posts from you and your followings</span>
+                    </div>
+
+                    <div th:if="${feedPosts == null or feedPosts.isEmpty()}" class="text-center py-5 text-muted">
+                        No posts yet. Follow someone or share your first image.
+                    </div>
+
+                    <article th:each="post : ${feedPosts}" class="card border mb-4 rounded-4 overflow-hidden">
+                        <img th:src="@{|/uploads/${post.imagePath}|}" class="w-100" style="max-height: 480px; object-fit: cover;" alt="Post image">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <a class="fw-bold text-decoration-none text-dark" th:href="@{|/users/${post.user.userName}|}" th:text="${post.user.userName}">Friend123</a>
+                                <span class="text-muted small" th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">26 Mar 2026</span>
+                            </div>
+                            <p class="mb-3" th:text="${post.caption} ?: 'Shared a new moment.'">Caption</p>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <form th:action="@{|/posts/${post.id}/like|}" method="post" class="mb-0">
+                                    <button class="btn btn-outline-danger btn-sm" type="submit">Like</button>
+                                </form>
+                                <span class="text-muted small" th:text="${#lists.size(post.likes)} + ' likes'">0 likes</span>
+                            </div>
+                            <div class="mb-3" th:if="${post.comments != null and !post.comments.isEmpty()}">
+                                <div th:each="comment : ${post.comments}" class="small mb-1">
+                                    <span class="fw-semibold" th:text="${comment.user.userName}">Friend123</span>
+                                    <span th:text="${comment.content}">Nice post</span>
+                                </div>
+                            </div>
+                            <form th:action="@{|/posts/${post.id}/comments|}" method="post" class="input-group">
+                                <input class="form-control" type="text" name="content" placeholder="Write a comment">
+                                <button class="btn btn-outline-primary" type="submit">Comment</button>
+                            </form>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

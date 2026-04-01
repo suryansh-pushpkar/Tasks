@@ -1,86 +1,110 @@
 package com.friendbook.service;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
+import com.friendbook.dto.ProfileResponse;
 import com.friendbook.dto.ProfileUpdateDTO;
 import com.friendbook.dto.UserDTO;
-import com.friendbook.entity.Post;
 import com.friendbook.entity.User;
-import com.friendbook.repository.PostRepository;
 import com.friendbook.repository.UserRepository;
-import com.friendbook.utility.UsernameUtil;
-
-import jakarta.transaction.Transactional;
+import java.util.List;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
 
-	private final UserRepository userRepo;
-	private final PostRepository postRepository;
-	private final PasswordEncoder passwordEncoder;
-	private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
+    private final UsernameGenerator usernameGenerator;
+    private final PasswordEncoder passwordEncoder;
 
-	public UserService(UserRepository userRepo, PostRepository postRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
-		this.userRepo = userRepo;
-		this.postRepository = postRepository;
-		this.passwordEncoder = passwordEncoder;
-		this.modelMapper = modelMapper;
-	}
-	@Transactional
-	public UserDTO registerUser(User user) {
-		user.setUsername(UsernameUtil.generateUniqueUsername(user.getFullName(), userRepo));
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		User dbUser = userRepo.save(user);
-		return modelMapper.map(dbUser, UserDTO.class);
-	}
+    public UserService(UserRepository userRepository, UsernameGenerator usernameGenerator, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.usernameGenerator = usernameGenerator;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-	public User authenticateUser(String email, String password) {
-		Optional<User> userOpt = userRepo.findByEmail(email);
-		if (userOpt.isPresent()) {
-			User user = userOpt.get();
-			if (passwordEncoder.matches(password, user.getPassword())) {
-				return user;
-			}
-		}
-		return null;
-	}
+    @Transactional
+    public User registerUser(UserDTO userDTO) {
+        if (userDTO.getCaptchaToken() == null || userDTO.getCaptchaToken().isBlank()) {
+            throw new IllegalArgumentException("Captcha verification is required");
+        }
+        if (userRepository.existsByEmail(userDTO.getEmail().trim().toLowerCase())) {
+            throw new IllegalArgumentException("Email is already registered");
+        }
 
-	public Optional<User> findByUsername(String username) {
-		return userRepo.findByUsername(username);
-	}
+        User user = new User();
+        user.setFullName(userDTO.getFullName().trim());
+        user.setEmail(userDTO.getEmail().trim().toLowerCase());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setUserName(usernameGenerator.generate(userDTO.getFullName()));
+        return userRepository.save(user);
+    }
 
-	public List<Post> findPostsByUser(User user) {
-		return postRepository.findByUserOrderByCreatedAtDesc(user);
-	}
+    @Transactional(readOnly = true)
+    public User getById(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
 
-	@Transactional
-	public Optional<User> updateProfile(String username, ProfileUpdateDTO dto) {
-		return userRepo.findByUsername(username).map(user -> {
-			user.setFullName(normalize(dto.getFullName()));
-			user.setEmail(normalize(dto.getEmail()));
-			user.setProfileImage(normalize(dto.getProfileImage()));
-			user.setFavSongs(normalize(dto.getFavSongs()));
-			user.setFavBooks(normalize(dto.getFavBooks()));
-			user.setFavPlaces(normalize(dto.getFavPlaces()));
+    @Transactional(readOnly = true)
+    public User getByUsername(String username) {
+        return userRepository.findByUserName(username)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
 
-			if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-				user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
-			}
+    @Transactional(readOnly = true)
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email.trim().toLowerCase())
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
 
-			return userRepo.save(user);
-		});
-	}
+    @Transactional
+    public ProfileResponse updateProfile(String username, ProfileUpdateDTO dto, String profileImage) {
+        User user = getByUsername(username);
+        String normalizedEmail = dto.getEmail().trim().toLowerCase();
+        if (!user.getEmail().equalsIgnoreCase(normalizedEmail) && userRepository.existsByEmail(normalizedEmail)) {
+            throw new IllegalArgumentException("Email is already registered");
+        }
 
-	private String normalize(String value) {
-		if (value == null) {
-			return null;
-		}
-		String trimmed = value.trim();
-		return trimmed.isEmpty() ? null : trimmed;
-	}
+        user.setFullName(dto.getFullName().trim());
+        user.setEmail(normalizedEmail);
+        user.setFavSongs(trimToNull(dto.getFavSongs()));
+        user.setFavBooks(trimToNull(dto.getFavBooks()));
+        user.setFavPlaces(trimToNull(dto.getFavPlaces()));
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+        if (profileImage != null) {
+            user.setProfileImage(profileImage);
+        }
+
+        User saved = userRepository.save(user);
+        return new ProfileResponse(
+            "Profile updated successfully",
+            saved.getUserName(),
+            saved.getFullName(),
+            saved.getEmail(),
+            saved.getFavSongs(),
+            saved.getFavBooks(),
+            saved.getFavPlaces(),
+            saved.getProfileImage()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> search(String query) {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+        return userRepository.findTop10ByUserNameContainingIgnoreCaseOrFullNameContainingIgnoreCase(query.trim(), query.trim());
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
 }

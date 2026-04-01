@@ -1,214 +1,246 @@
 package com.friendbook.entity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "users")
-public class User implements UserDetails {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@EqualsAndHashCode.Include
-	private Long id;
-	@Column(nullable = false)
-	private String fullName;
+public class User {
 
-	@Column(unique = true, nullable = false)
-	private String email;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false)
-	private String password;
+    @Column(nullable = false, length = 100)
+    private String fullName;
 
-	@Column(unique = true)
-	private String username;
-	private String profileImage = "porfile.png";
-	private String favSongs;
-	private String favBooks;
-	private String favPlaces;
+    @Column(nullable = false, unique = true, length = 150)
+    private String email;
 
-	public String getUserName() {
-		return username;
-	}
+    @Column(nullable = false)
+    private String password;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	private List<Post> posts;
+    @Column(nullable = false, unique = true, length = 32)
+    private String userName;
 
-	@ManyToMany
-	@JoinTable(name = "followers", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
-	private Set<User> followers = new HashSet<>();
+    @Column(length = 255)
+    private String profileImage;
 
-	@ManyToMany(mappedBy = "followers")
-	private Set<User> following = new HashSet<>();
+    @Column(length = 255)
+    private String favSongs;
 
-	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FriendRequest> receivedRequests = new ArrayList<>();
+    @Column(length = 255)
+    private String favBooks;
 
-	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FriendRequest> sentRequests = new ArrayList<>();
+    @Column(length = 255)
+    private String favPlaces;
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-	}
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
-	@Override
-	public String getUsername() {
-		return email;
-	}
+    @OneToMany(mappedBy = "user")
+    private List<Post> posts = new ArrayList<>();
 
-	@Override
-	public String getPassword() {
-		return password;
-	}
+    @OneToMany(mappedBy = "sender")
+    private List<FriendRequest> sentRequests = new ArrayList<>();
 
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+    @OneToMany(mappedBy = "receiver")
+    private List<FriendRequest> receivedRequests = new ArrayList<>();
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> followingRelationships = new ArrayList<>();
 
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+    @OneToMany(mappedBy = "following")
+    private List<Follow> followerRelationships = new ArrayList<>();
 
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
+    @OneToMany(mappedBy = "user")
+    private List<PostComment> comments = new ArrayList<>();
 
-	public String getUsernameField() {
-		return username;
-	}
+    @OneToMany(mappedBy = "user")
+    private List<PostLike> likes = new ArrayList<>();
 
-	public Long getId() {
-		return id;
-	}
+    @PrePersist
+    void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getFullName() {
-		return fullName;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getProfileImage() {
-		return profileImage;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setProfileImage(String profileImage) {
-		this.profileImage = profileImage;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getFavSongs() {
-		return favSongs;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setFavSongs(String favSongs) {
-		this.favSongs = favSongs;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public String getFavBooks() {
-		return favBooks;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public void setFavBooks(String favBooks) {
-		this.favBooks = favBooks;
-	}
+    public String getProfileImage() {
+        return profileImage;
+    }
 
-	public String getFavPlaces() {
-		return favPlaces;
-	}
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
 
-	public void setFavPlaces(String favPlaces) {
-		this.favPlaces = favPlaces;
-	}
+    public String getFavSongs() {
+        return favSongs;
+    }
 
-	public List<Post> getPosts() {
-		return posts;
-	}
+    public void setFavSongs(String favSongs) {
+        this.favSongs = favSongs;
+    }
 
-	public void setPosts(List<Post> posts) {
-		this.posts = posts;
-	}
+    public String getFavBooks() {
+        return favBooks;
+    }
 
-	public Set<User> getFollowers() {
-		return followers;
-	}
+    public void setFavBooks(String favBooks) {
+        this.favBooks = favBooks;
+    }
 
-	public void setFollowers(Set<User> followers) {
-		this.followers = followers;
-	}
+    public String getFavPlaces() {
+        return favPlaces;
+    }
 
-	public Set<User> getFollowing() {
-		return following;
-	}
+    public void setFavPlaces(String favPlaces) {
+        this.favPlaces = favPlaces;
+    }
 
-	public void setFollowing(Set<User> following) {
-		this.following = following;
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-	public List<FriendRequest> getReceivedRequests() {
-		return receivedRequests;
-	}
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public void setReceivedRequests(List<FriendRequest> receivedRequests) {
-		this.receivedRequests = receivedRequests;
-	}
+    public List<Post> getPosts() {
+        return posts;
+    }
 
-	public List<FriendRequest> getSentRequests() {
-		return sentRequests;
-	}
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
 
-	public void setSentRequests(List<FriendRequest> sentRequests) {
-		this.sentRequests = sentRequests;
-	}
+    public List<FriendRequest> getSentRequests() {
+        return sentRequests;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setSentRequests(List<FriendRequest> sentRequests) {
+        this.sentRequests = sentRequests;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public List<FriendRequest> getReceivedRequests() {
+        return receivedRequests;
+    }
 
+    public void setReceivedRequests(List<FriendRequest> receivedRequests) {
+        this.receivedRequests = receivedRequests;
+    }
+
+    public List<Follow> getFollowingRelationships() {
+        return followingRelationships;
+    }
+
+    public void setFollowingRelationships(List<Follow> followingRelationships) {
+        this.followingRelationships = followingRelationships;
+    }
+
+    public List<Follow> getFollowerRelationships() {
+        return followerRelationships;
+    }
+
+    public void setFollowerRelationships(List<Follow> followerRelationships) {
+        this.followerRelationships = followerRelationships;
+    }
+
+    public List<PostComment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<PostComment> comments) {
+        this.comments = comments;
+    }
+
+    public List<PostLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<PostLike> likes) {
+        this.likes = likes;
+    }
+
+    public void addPost(Post post) {
+        posts.add(post);
+        post.setUser(this);
+    }
+
+    public void addSentRequest(FriendRequest friendRequest) {
+        sentRequests.add(friendRequest);
+        friendRequest.setSender(this);
+    }
+
+    public void addReceivedRequest(FriendRequest friendRequest) {
+        receivedRequests.add(friendRequest);
+        friendRequest.setReceiver(this);
+    }
+
+    public void addFollowingRelationship(Follow follow) {
+        followingRelationships.add(follow);
+        follow.setFollower(this);
+    }
+
+    public void addFollowerRelationship(Follow follow) {
+        followerRelationships.add(follow);
+        follow.setFollowing(this);
+    }
+
+    public void addComment(PostComment comment) {
+        comments.add(comment);
+        comment.setUser(this);
+    }
+
+    public void addLike(PostLike like) {
+        likes.add(like);
+        like.setUser(this);
+    }
 }

@@ -2,7 +2,6 @@ package com.friendbook.config;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -13,13 +12,13 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path assetPath = Paths.get("../assets").toAbsolutePath().normalize();
-        registry.addResourceHandler("/assets/**")
-                .addResourceLocations(assetPath.toUri().toString());
+        Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
+        registry.addResourceHandler("/uploads/**")
+            .addResourceLocations(uploadDir.toUri().toString());
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addRedirectViewController("/profile", "/login");
+        registry.addViewController("/about").setViewName("about");
     }
 }

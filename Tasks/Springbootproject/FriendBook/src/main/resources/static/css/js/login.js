@@ -1,6 +1,11 @@
 $(document).ready(function () {
     const loginForm = $('#loginForm');
     const messageDiv = $('#loginMessage');
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get('logout')) {
+        sessionStorage.removeItem('friendbookToken');
+    }
 
     loginForm.on('submit', function (e) {
         e.preventDefault();

@@ -7,20 +7,47 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link px-3" th:href="@{/}">Home</a>
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                <li class="nav-item" th:if="${currentUser != null}">
+                    <a class="nav-link px-3" th:href="@{/home}">Home</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${currentUser != null}">
+                    <a class="nav-link px-3" th:href="@{/profile}" th:text="${currentUser.userName}">Profile</a>
+                </li>
+                <li class="nav-item" th:if="${currentUser == null}">
                     <a class="nav-link px-3" th:href="@{/about}">About</a>
                 </li>
-                <li class="nav-item ms-lg-2">
+                <li class="nav-item ms-lg-2" th:if="${currentUser == null}">
                     <a class="btn btn-outline-primary btn-sm px-4" th:href="@{/login}">Login</a>
                 </li>
-                <li class="nav-item ms-lg-2">
+                <li class="nav-item ms-lg-2" th:if="${currentUser == null}">
                     <a class="btn btn-primary btn-sm px-4" th:href="@{/signup}">Register</a>
+                </li>
+                <li class="nav-item ms-lg-2" th:if="${currentUser != null}">
+                    <button class="btn btn-outline-danger btn-sm px-4" type="button" id="logoutButton">Logout</button>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const logoutButton = document.getElementById('logoutButton');
+        if (!logoutButton) {
+            return;
+        }
+
+        logoutButton.addEventListener('click', async () => {
+            const token = sessionStorage.getItem('friendbookToken');
+            try {
+                await fetch('/auth/logout', {
+                    method: 'POST',
+                    headers: token ? { Authorization: `Bearer ${token}` } : {}
+                });
+            } finally {
+                sessionStorage.removeItem('friendbookToken');
+                window.location.href = '/login?logout';
+            }
+        });
+    });
+</script>

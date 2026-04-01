@@ -1,25 +1,17 @@
 package com.friendbook.repository;
 
+import com.friendbook.entity.FollowRequestStatus;
 import com.friendbook.entity.FriendRequest;
 import com.friendbook.entity.User;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
 public interface FriendRequestRepository extends JpaRepository<FriendRequest, Long> {
 
-    boolean existsBySenderAndReceiver(User sender, User receiver);
+    Optional<FriendRequest> findBySenderAndReceiverAndStatus(User sender, User receiver, FollowRequestStatus status);
 
-    @EntityGraph(attributePaths = {"sender"})
-    List<FriendRequest> findByReceiverAndAcceptedFalse(User receiver);
+    List<FriendRequest> findByReceiverAndStatusOrderByCreatedAtDesc(User receiver, FollowRequestStatus status);
 
-    Optional<FriendRequest> findBySenderAndReceiver(User sender, User receiver);
-
-    List<FriendRequest> findByReceiverAndStatus(User receiver, String status);
-
-    Optional<FriendRequest> findBySenderAndReceiverAndStatus(User sender, User receiver, String status);
+    List<FriendRequest> findBySenderOrReceiverOrderByCreatedAtDesc(User sender, User receiver);
 }
