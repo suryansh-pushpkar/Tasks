@@ -12,3 +12,7 @@ function serveChai (msg ? :string ){
     }
     return `serving default ginger tea`
 }
+
+type MasalaChai = {type: "Masala"; spicelevel : number}
+type GingerChai = {type: "ginger"; amount : number};
+type ElaichiChai = {type: "elaichi"; aroma : number}
