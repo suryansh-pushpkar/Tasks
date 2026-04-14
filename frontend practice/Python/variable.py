@@ -1,10 +1,15 @@
 a = 10 
-b = 20 
-c = a + b
-print("Addition : ", c)
+b = 10 
+print(id(a) == id(b))
 
-a = 500 
-b = 500
+c = 500 
+d = 500
 
-print(id(a))
-print(id(b))
+print(id(c) == id(d))
+print(a)
+
+def compare(x, y):
+    return a-b
+
+sort([1, 2, 3], key=cmp_to_key(compare))
+
