@@ -10,6 +10,3 @@ print(a)
 
 def compare(x, y):
     return a-b
-
-sort([1, 2, 3], key=cmp_to_key(compare))
-
